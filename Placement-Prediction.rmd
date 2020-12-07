@@ -31,7 +31,7 @@ knitr::opts_chunk$set(
     tidy = FALSE, # cleaner code printing
     size = "small", # smaller code
     
-    fig.path = "figures/",# where the figures will end up
+    fig.path = "figures/", #graphics location
     out.width = "100%",
 
     message = FALSE,
@@ -83,6 +83,23 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
 
 Can we predict which candiates was placed in a role? If so, which factors helped the most (ie. work experience, degree, school results, gender, etc)?
 
+## Key takeaways
+
+
+#### Students {-}
+
+The LDA2 model might be more suitable as it did not have any false positives. This means that it correctly predicted if a student shouldn't apply for a role. 
+
+The most important factors, as shown by the Random Forrest model were secondary scores, higher secondary schores and work experience.
+
+
+#### Hiring Managers {-}
+
+The second model might be more suitable as it achieved a higher overall accuracy and more student were predicted correctly.
+
+
+The model achieved 
+
 
 ## Dataset information:
 
@@ -93,28 +110,47 @@ attribute <- names(raw_data)
 description <- c(
 "Serial Number",
 "Gender: Male='M', Female='F'",
-"Secondary Education percentage - 10th Grade",
+"Secondary Education Percentage (grades 9 and 10) - exam at the end of 10th grade",
 "Board of Education - Central/Others",
-"Higher Secondary Education percentage - 12th Grade",
+"Higher Secondary Education (grades 11 and 12) - exam at the end of 12th grade",
 "Board of Education - Central/Others",
 "Specialization in Higher Secondary Education",
 "Degree Percentage",
-"Undergraduate(Degree type) - Field of degree education",
-"Work Experience",
-"Employability test percentage (conducted by college)",
-"Post Graduation(MBA)- Specialization",
+"Undergraduate (Degree type) - Field of degree education",
+"Work Experience - Yes/No",
+"Employability test Percentage (conducted by college)",
+"Post Graduation (MBA) - Specialization",
 "MBA percentage",
 "Status of placement - Placed/Not placed",
 "Salary offered by corporate to candidates")
 
-dataset_table <-as.data.frame(cbind(attribute,description))
+type <- c(
+"numeric",
+"factor",
+"numeric",
+"factor",
+"numeric",
+"factor",
+"factor",
+"numeric",
+"factor",
+"factor",
+"numeric",
+"factor",
+"numeric",
+"factor",
+"numeric")
 
-dataset_table %>%   kbl() %>%
+dataset_table <-as.data.frame(cbind(attribute, type, description))
+
+dataset_table %>%
+  kbl(align = c("r", "l", "l"))%>%
   kable_paper("hover", full_width = F)%>%
-  column_spec(1, bold = TRUE)
+  column_spec(1, bold = TRUE)%>%
+  column_spec(2, italic = TRUE)
 
 #clear variables from environment
-rm(attribute, description, dataset_table)
+rm(attribute, type, description, dataset_table)
 ```
 
 
@@ -126,7 +162,8 @@ Check for *NULL*s:
 raw_data %>% summarise_all(~ sum(is.null(.))) %>% sum() %>% 
   kbl(col.names = "Number of NULLs",
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(1, color = "green", bold = TRUE)
 ```
 
 
@@ -138,7 +175,8 @@ Check for *NA*s:
 raw_data %>% summarise_all(~ sum(is.na(.))) %>% sum() %>%
     kbl(col.names = "Number of NAs",
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(1, color = "red", bold = TRUE)
 ```
 
 
@@ -149,7 +187,9 @@ Let's dig deeper and see why we have 67 NAs.
 #we have 67 NAs - let's see which category has these values
 raw_data %>% summarise_all(~ sum(is.na(.))) %>%
     kbl()%>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(15, color = "red", bold = TRUE)%>%
+  column_spec(1:14, color = "green", bold = TRUE)
 ```
 
 
@@ -161,7 +201,9 @@ Lastly, we need to check why we have these 67 NAs in the salary category. Is thi
 raw_data %>% group_by(status) %>% count() %>%     
   kbl(col.names = c("Status", "n"),
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  row_spec(1, color = "red", bold = TRUE)%>%
+  row_spec(2, color = "green", bold = TRUE)
 ```
 
 
@@ -172,6 +214,12 @@ It looks like we have 67 NAs in the salary column due to the fact that 67 studen
 
 
 ## Correlation plot
+
+
+**Key findings**:
+
+* we can observe **medium correlations between the academic scores**. This suggests that students who performed well in secondary school were likely to also perform well within further education (higher secondary, university and MBA)
+* interestingly, **employability test scores only had a low correlation with academic scores**. **Perhaps**, this suggests that these tests were more practical than theoretical
 
 
 ```{r}
@@ -207,13 +255,13 @@ rm(corr, p.mat, raw_data_corr)
 ```
 
 
+## Grade distribution {.tabset .tabset-fade .tabset-pills}
+
+
 **Key findings**:
 
-* we can observe **medium correlations between the academic scores**. This suggests that students who performed well in secondary school were likely to also perform well within further education (high school, university and MBA)
-* interestingly, **employability test scores only had a low correlation with academic scores**. Perhaps, this suggests that these tests were more practical than theoretical?
-
-
-## Grade distribution {.tabset .tabset-fade .tabset-pills}
+* the distribution becomes more concentated around the median (60-70) as a student progresses in their education, **from secondary** (wide distribution) **to MBA** (narrow distribution)
+* the **employability test** has a different trend, with a very wide and almost equal distribution of each score group
 
 
 ### secondary {-}
@@ -231,7 +279,7 @@ raw_data %>%
 ```
 
 
-### high school {-}
+### higher secondary {-}
 
 
 ```{r}
@@ -291,12 +339,13 @@ raw_data %>%
 ```
 
 
-We can see that the distribution is more concentated around the median as a student progresses in their education, from secondary school (wide distribution) to MBA (narrow distribution).
-
-The employability test has a different trend, with a very wide and almost equal distribution of each score group.
-
-
 ## Are there any gender-specific differences in performance scores? {.tabset .tabset-fade .tabset-pills}
+
+
+**Key findings**:
+
+* females scored significantly higher than men at **university** and **MBA** level
+* no significant differences in performance during **secondary**, **higher secondary** and **employability test**
 
 
 ### university {-}
@@ -345,37 +394,54 @@ t_test_mba %>%
 ```
 
 
-There were no significant differences in performance during secondary, high school and employability test.
-
-
-Next, we would like to know if these differences led to a better chance of receiving a placement role.
-
-
 ## Did the academic peformance help in receiving an offer? {.tabset .tabset-fade .tabset-pills}
+
+
+Since we know that the results got more concentrated around the median (60-70) as the student progressed in their education, we could infer that there was less of a chance to differentiate themselves based on grade and more based on other factors such as:
+* *employability score*
+* *work experience*
+* *technical skills*
+* *soft skills*
+* *better interviewing skills*
+
+Unfortunately, out of these factors, we only have data on the employability score.
+
+
+**Key findings**:
+
+The score differences between those who received an offer and those who did not:
+
+* were highly significant at the **secondary**, **higher secondary** and **university** level
+* significant at **employability test**
+* no significance at the **MBA** level
 
 
 ### secondary {-}
 
 
 ```{r}
-t_test <- raw_data%>%
+t_test <- raw_data %>%
   t_test(ssc_p ~ status)%>%
   add_significance()
 
 raw_data %>% 
   ggplot(aes(ssc_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
+
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
 
-### high school {-}
+### higher secondary {-}
 
 
 ```{r}
@@ -385,56 +451,68 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(hsc_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
+
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
 
 ### university {-}
 
 
-```{r}
+```{r results = "asis"}
 t_test <- raw_data%>%
   t_test(degree_p ~ status)%>%
   add_significance()
 
 raw_data %>% 
   ggplot(aes(degree_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
+
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
 
 ### MBA {-}
 
 
-```{r}
+```{r results = "asis"}
 t_test <- raw_data%>%
   t_test(mba_p ~ status)%>%
   add_significance()
 
 raw_data %>% 
   ggplot(aes(mba_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
+
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
 
 
@@ -448,220 +526,314 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(etest_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
+
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 ```
-
-
-Knowing that the results got more concentrated around the mean, we could maybe infer that there was less of a chance for a student to differentiate themselves based on grade, and more based on other factors such as employability score, work experience, technical skills, soft skills, better interviews, etc. Unfortunately, out of these factors, we only have data on the employability score.
-
 
 
 ## Did the different boards make a significant difference in school peformance/placement offer? {.tabset .tabset-fade .tabset-pills}
 
 
+**Key findings**:
+
+* no significant differences in school performance between the two boards at either **secondary** or **higher secondary** level
+* there was also no significant difference in the number of people that received an offer from either board at the **secondary** or **higher secondary** level
+
+
 ### secondary {-}
 
 
-``` {r}
-t_test <- raw_data%>%
-  t_test(ssc_p ~ ssc_b)%>%
-  add_significance()
-
+```{r}
+#vs performance
 raw_data %>% 
   ggplot(aes(ssc_p, fill=ssc_b, col = ssc_b))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Density")+
   theme_few()
 
+#t-test
+t_test <- raw_data%>%
+  t_test(ssc_p ~ ssc_b)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 
-#fix this
+t_test
+
+#vs placement
 raw_data %>% 
   ggplot(aes(ssc_b, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Board",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$ssc_b, raw_data$status))
 ```
 
 
-### high school {-}
+### higher secondary {-}
 
 
 ```{r}
+#vs performance
+raw_data %>% 
+  ggplot(aes(hsc_p, fill=hsc_b, col = hsc_b))+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Density")+
+  theme_few()
+
+#t-test for performance
 t_test <- raw_data%>%
   t_test(hsc_p ~ hsc_b)%>%
-  add_significance()
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 
-raw_data %>% 
-  ggplot(aes(hsc_p, fill=specialisation))+
-  geom_density(alpha = 0.2, show.legend = FALSE, col = "black")+
-  geom_rug()+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
-  theme_few()
+t_test
 
-#fix this
+#vs placement
 raw_data %>% 
   ggplot(aes(hsc_b, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Board",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$hsc_b, raw_data$status))
 ```
 
 
 ## Did the specialisation help in getting a role? {.tabset .tabset-fade .tabset-pills}
 
 
-### high school {-}
+**Key findings**:
+
+* **higher secondary**:
+  * Commerce students scored significantly lower than Science students
+  * no significant difference between any groups in placement offers (however, this might not be accurate given that there were only 11 students in Arts versus 113 in Commerce and 91 in Science)
+* **university**:
+  * Science and Technology students scored significantly higher than those in Others
+  * there were no significant differences between the different groups regarding as it regarded the amount of students that received an offer (results might not be accurate due to a very low sample sample size in Others of 11 versus 145 in Commerce and Management and 59 in Science and Technology)
+* **MBA**:
+  * there were no significant differences in performance between the two groups
+  * significantly more Marketing and Finance students received an offer when compared to those specialised in Marketing and HR
 
 
-``` {r}
+### higher secondary {-}
+
+
+```{r}
+#vs performance
+raw_data %>% 
+  ggplot(aes(hsc_p, hsc_s, fill=hsc_s, col = hsc_s))+
+  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Specialisation")+
+  theme(legend.position = "none")+
+  theme_few()
+
+#t-test
 t_test <- raw_data%>%
   t_test(hsc_p ~ hsc_s)%>%
-  add_significance()
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 
-raw_data %>% 
-  ggplot(aes(hsc_p, hsc_s, fill=hsc_s))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
-  theme_few()
+t_test
 
-
+#vs placement
 raw_data %>% 
   ggplot(aes(hsc_s, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$hsc_s, raw_data$status))
 ```
 
 
 ### university {-}
 
 
-``` {r}
+```{r}
+#vs performance
+raw_data %>% 
+  ggplot(aes(degree_p, degree_t, fill=degree_t, col = degree_t))+
+  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Specialisation")+
+  theme_few()
+
+#t-test
 t_test <- raw_data%>%
   t_test(degree_p ~ degree_t)%>%
-  add_significance()
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 
-raw_data %>% 
-  ggplot(aes(degree_p, degree_t, fill=degree_t))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
-  theme_few()
+t_test
 
-
+#vs placement
 raw_data %>% 
   ggplot(aes(degree_t, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$degree_t, raw_data$status))
 ```
 
 
 ### MBA {-}
 
 
-``` {r}
+```{r}
+#vs performance
+raw_data %>% 
+  ggplot(aes(mba_p, fill=specialisation, col = specialisation))+
+  geom_boxplot(alpha = 0.3, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Specialisation",
+       x = "Score",
+       y = "Density")+
+  theme_few()
+
+#t-test
 t_test <- raw_data%>%
   t_test(mba_p ~ specialisation)%>%
-  add_significance()
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
 
-raw_data %>% 
-  ggplot(aes(mba_p, specialisation, fill=specialisation, col = specialisation))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
-  theme_few()
+t_test
 
-
+#vs placement
 raw_data %>% 
   ggplot(aes(specialisation, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$specialisation, raw_data$status))
 ```
 
 
 ## Is there a difference between the two genders in getting a placement?
 
 
+**Key findings**:
+
+* there were no significant differences in gender between the students that received a role and those that did not
+
+
 ```{r}
+#graph
 raw_data %>%
   group_by(gender, status)%>%
-  summarise(count = n())%>%
-  mutate(percentage = round(count/sum(count),2)*100)%>%
-        
-  ggplot(aes(status, percentage, fill = status))+
-  geom_col(position = "dodge", col = "black")+
-  geom_label(aes(label = paste(percentage, "%")), show.legend = FALSE)+
+  summarise(count = n()/100)%>%
+  mutate(percentage = round(count/sum(count),2))%>%
+  
+ggplot(aes(gender, count, fill = status))+
+  geom_col(position = "fill", col = "black")+
+  geom_label(aes(x=gender, 
+                 y = ifelse(percentage>.5, percentage - .25, percentage + .5), 
+                 label = paste(percentage*100, "%")), 
+             show.legend = FALSE)+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  facet_wrap(.~gender)+
-  labs(title = "A higher proportion of females failed to receive a placement than males, \ndespite females performing better at university and MBA",
-       x = NULL,
-       y = "Number of students",
-       fill = "Status")+
+  scale_y_continuous(label = percent)+
+  labs(x = "Gender",
+       y = "% of students",
+       fill = "Status",
+       subtitle = "Proportionaly, more males were offered a role but this was not statistically significant")+
   theme_few()
+
+#categorical variables
+chisq.test(table(raw_data$gender, raw_data$status)) %>% print()
 ```
 
 
 ## Does work experience matter in getting a role?
 
 
+**Key findings**:
+
+* significantly more students with work experience received offers than those without any work experience
+
+
 ```{r}
+#graph
 raw_data %>% group_by(workex, status)%>% 
   summarise(count = n())%>%
-  mutate(perc = round(count / sum(count),2)*100,
-         diff = perc - 50)%>%
+  mutate(percentage = round(count / sum(count),2))%>%
         
-  ggplot(aes(workex, perc, fill = status))+
+  ggplot(aes(workex, percentage, fill = status))+
   geom_col(col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  geom_label(aes(label = paste(perc, "%"), y = 55 - diff), show.legend = FALSE)+
+  geom_label(aes(x=workex, 
+                 y = ifelse(percentage>.46, percentage - .25, 
+                            ifelse(percentage>.65, -.20, 
+                                   .92)), 
+                 label = paste(percentage*100, "%")), 
+             show.legend = FALSE)+
   labs(title = "Work experience significantly increases the chance of getting placed",
        subtitle = "87% of peple with work experience were placed versus 60% of those without work experience",
        x = "Work Experience",
@@ -670,6 +842,9 @@ raw_data %>% group_by(workex, status)%>%
   theme_few()+
   theme(axis.ticks.y = element_blank(),
         axis.text.y = element_blank())
+
+#categorical variables
+chisq.test(table(raw_data$workex, raw_data$status)) %>% print()
 ```
 
 
@@ -679,7 +854,7 @@ raw_data %>% group_by(workex, status)%>%
 ## Data split
 
 
-Based on the previous Exploratory Data Analysis, we have no reason to believe that any of the features are insignificant, so none of them are to be removed from the modelling.
+Based on the previous Exploratory Data Analysis, we're not very clear on whether any of the features are insignificant, so none of them are to be removed from the modelling.
 
 Let's split the dataset into the following:
 
@@ -692,7 +867,7 @@ set.seed(123)
 
 #clean model data
 raw_data_model <- raw_data %>%
-  select(-sl_no, -salary)%>%
+  select(-salary)%>%
   mutate(status = as.factor(make.names(status)))
 
 #split into two datasets
@@ -748,20 +923,19 @@ Let's use some basic standardisation offered by the caret package such as **cent
 
 
 ```{r}
-#store the y variable in its original format
-#y <- train_data$status
+#store the ID variable in its original format
+y_test <- test_data$sl_no
+y_train <- train_data$sl_no
 
 #take out y variable temporarily as we do not want this to be processed
-#train_data <- train_data %>% select (-status)
+test_data <- test_data %>% select (-sl_no)
+train_data <- train_data %>% select (-sl_no)
 
 #center and scale our data
 preProcess_range_model <- preProcess(train_data, method=c("center", "scale"))
 
 train_data <- predict(preProcess_range_model, newdata = train_data)
 test_data <- predict(preProcess_range_model, newdata = test_data)
- 
-#Append the Y variable back on with original values
-#train_data$status <- y
 ```
 
 
@@ -777,7 +951,7 @@ Essentially, we are "pretending" that some of our data is new and use the rest o
 train.control <- trainControl(method = "repeatedcv", 
                               number = 10, #10
                               repeats = 5, #5
-                              search = "random",
+                              #search = "random",
                               classProbs = T)
 
 tune.Length <- 10
@@ -970,7 +1144,7 @@ confusionMatrix(preds, test_data$status)
 ### 5 - xgboost {-}
 
 
-```{r echo=TRUE, cache = TRUE, results='hide'}
+```{r eval=FALSE, cache=TRUE, include=FALSE, results='hide'}
 #run them all in paralel
 cl <- makeCluster(clusters, type = "SOCK")
 
@@ -1004,7 +1178,7 @@ head(predict(model_xgb, newdata = test_data, type = "prob"))
 ```
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 preds <- predict(model_xgb, newdata = test_data)
 
 confusionMatrix(preds, test_data$status)
@@ -1105,7 +1279,7 @@ confusionMatrix(preds, test_data$status)
 ### 8 - Extreme Gradient Boosting {-}
 
 
-```{r echo=TRUE, cache = TRUE, results='hide'}
+```{r eval=FALSE, cache=TRUE, include=FALSE, results='hide'}
 #run them all in paralel
 cl <- makeCluster(clusters, type = "SOCK")
 
@@ -1139,7 +1313,7 @@ head(predict(model_xgbDART, newdata = test_data, type = "prob"))
 ```
 
 
-```{r}
+```{r eval=FALSE, include=FALSE}
 preds <- predict(model_xgbDART, newdata = test_data)
 
 confusionMatrix(preds, test_data$status)
@@ -1244,9 +1418,9 @@ models_compare <- resamples(list(glm=model_glm,
                                  rpart = model_rpart,
                                  ranger = model_ranger,
                                  svm = model_svm,
-                                 xgb = model_xgb,
+                                 #xgb = model_xgb,
                                  knn = model_knn,
-                                 xgbDART = model_xgbDART,
+                                 #xgbDART = model_xgbDART,
                                  rf = model_rf,
                                  mars = model_mars))
 
@@ -1291,7 +1465,7 @@ We can see the actual predictions of each model below.
 
 ```{r}
 test_data%>%
-  select(status, lda2, ranger, svm, glm, xgb, rf, knn, mars, xgbDART, rpart)%>%
+  select(status, lda2, ranger, svm, glm, rf, knn, mars, rpart)%>% #ensure these are filled in
   rename(Actual = status)%>%
   mutate(lda2 = ifelse(Actual == lda2, 
                       cell_spec(lda2, "html", color = "limegreen", bold = T), 
@@ -1305,9 +1479,9 @@ test_data%>%
          glm = ifelse(Actual == glm, 
                       cell_spec(glm, "html", color = "limegreen", bold = T), 
                       cell_spec(glm, "html", color = "red", bold = T)),
-         xgb = ifelse(Actual == xgb, 
-                      cell_spec(xgb, "html", color = "limegreen", bold = T), 
-                      cell_spec(xgb, "html", color = "red", bold = T)),
+         #xgb = ifelse(Actual == xgb, 
+         #             cell_spec(xgb, "html", color = "limegreen", bold = T), 
+         #             cell_spec(xgb, "html", color = "red", bold = T)),
          rf = ifelse(Actual == rf, 
                       cell_spec(rf, "html", color = "limegreen", bold = T), 
                       cell_spec(rf, "html", color = "red", bold = T)),
@@ -1317,9 +1491,9 @@ test_data%>%
          mars = ifelse(Actual == mars, 
                       cell_spec(mars, "html", color = "limegreen", bold = T), 
                       cell_spec(mars, "html", color = "red", bold = T)),
-         xgbDART = ifelse(Actual == xgbDART, 
-                      cell_spec(xgbDART, "html", color = "limegreen", bold = T), 
-                      cell_spec(xgbDART, "html", color = "red", bold = T)), 
+         #xgbDART = ifelse(Actual == xgbDART, 
+         #             cell_spec(xgbDART, "html", color = "limegreen", bold = T), 
+        #              cell_spec(xgbDART, "html", color = "red", bold = T)), 
          rpart = ifelse(Actual == rpart, 
                       cell_spec(rpart, "html", color = "limegreen", bold = T), 
                       cell_spec(rpart, "html", color = "red", bold = T))) %>%
@@ -1345,14 +1519,36 @@ We should investigate to see what's special about these two groups of students.
 
 Let's graph these students against the top 2-3 variables by importance and see if there are any trends
 
+```{r}
+#Append the Y variable back on with original values
+test_data$sl_no <- y_test  
+train_data$sl_no <- y_train
+
+#clear variables from memory
+rm(y_test, y_train)
+```
+
 
 ```{r eval=FALSE, include=FALSE}
-#put these after the importance graph?
+#get student's id
 test_data%>%
-  filter(svm!=status & status == "Not Placed")%>%
-  view()
+  filter(ranger!=status & status == "Not.Placed")%>%
+  select(sl_no, ssc_p, hsc_p)%>%
+  print()
 
-#might have to get the student ID number in to identify these people
+#see original data
+raw_data %>% filter() %>%
+  print()
+
+#graph it
+raw_data %>% mutate(class = ifelse(sl_no %in% c(10,76, 98, 131, 142, 159, 166, 182), "Yes", "No"),
+                    size = as.factor(ifelse(sl_no %in% c(10,76, 98, 131, 142, 159, 166, 182), 5, 4)))%>%
+  
+  ggplot(aes(ssc_p, hsc_p, col = status, size = size))+
+  geom_point()+
+  geom_vline(xintercept =69.8)+
+  geom_hline(yintercept =60.8)+
+  facet_wrap(workex~specialisation)
 ```
 
 
@@ -1360,11 +1556,26 @@ test_data%>%
 
 
 ```{r eval=FALSE, include=FALSE}
+#get student's id
 test_data%>%
-  filter(svm!=status & status == "Placed")%>%
-  view()
+  filter(lda2!=status & status == "Placed")%>%
+  select(sl_no, ssc_p, hsc_p)%>%
+  print()
 
-#might have to get the student ID number in to identify these people
+#see original data
+raw_data %>% filter(sl_no == 23) %>%
+  print()
+
+#graph it
+raw_data %>% mutate(class = ifelse(sl_no == 23, "Yes", "No"),
+                    size = as.factor(ifelse(sl_no == 23, 5, 4)))%>%
+  
+  ggplot(aes(mba_p, degree_p, col = status, size = size))+
+  geom_point()+
+  geom_vline(xintercept =69.8)+
+  geom_hline(yintercept =60.8)+
+  facet_wrap(workex~specialisation)
+
 ```
 
 
@@ -1417,11 +1628,9 @@ plot(imp, main = "Top variables ranked by importance",
 * predictive algorithm on salary and which factors contributed
 
 
-# Others (to be removed)
 
 
-Classification:
-* what do the probability estimates for each class tell us about the model's confidence? (51% vs 99%) - equivocal areas
+
 
 
 
@@ -1441,12 +1650,10 @@ FN             TN              28.4       -      Non-response
 
 4) combine proportion of the model
 
-
-* finish data exploration
 * read others' project and learn from them
 
+* what do the probability estimates for each class tell us about the model's confidence? (51% vs 99%) - equivocal areas
 
 * try and understand why it failed on those people that the model failed on
-
 
 - metric = "ROC"?

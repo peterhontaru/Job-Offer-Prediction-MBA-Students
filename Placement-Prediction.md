@@ -19,7 +19,7 @@
         
         keep_md: true
         
-    title: "Placement Prediction - University Students"
+    title: "Job Offer Prediction - MBA Students"
     subtitle: "I'm... hired? Can we predict which student received a placement offer?"
     author: "by Peter Hontaru"
 ---
@@ -32,7 +32,7 @@ knitr::opts_chunk$set(
     tidy = FALSE, # cleaner code printing
     size = "small", # smaller code
     
-    fig.path = "figures/",# where the figures will end up
+    fig.path = "figures/", #graphics location
     out.width = "100%",
 
     message = FALSE,
@@ -49,7 +49,7 @@ knitr::opts_chunk$set(
 setwd("~/DS/AHT/Data")
 
 #import data
-raw_data <- read_csv("~/DS/Placement-Prediction-University-Students/raw data/Placement_Data_Full_Class.csv")%>%
+raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_Data_Full_Class.csv")%>%
   mutate(gender = as.factor(gender),
                ssc_b = as.factor(ssc_b),
                hsc_b = as.factor(hsc_b),
@@ -68,6 +68,23 @@ raw_data <- read_csv("~/DS/Placement-Prediction-University-Students/raw data/Pla
 
 Can we predict which candiates was placed in a role? If so, which factors helped the most (ie. work experience, degree, school results, gender, etc)?
 
+## Key takeaways
+
+
+#### Students {-}
+
+The LDA2 model might be more suitable as it did not have any false positives. This means that it correctly predicted if a student shouldn't apply for a role. 
+
+The most important factors, as shown by the Random Forrest model were secondary scores, higher secondary schores and work experience.
+
+
+#### Hiring Managers {-}
+
+The second model might be more suitable as it achieved a higher overall accuracy and more student were predicted correctly.
+
+
+The model achieved 
+
 
 ## Dataset information:
 
@@ -79,93 +96,128 @@ attribute <- names(raw_data)
 description <- c(
 "Serial Number",
 "Gender: Male='M', Female='F'",
-"Secondary Education percentage - 10th Grade",
+"Secondary Education Percentage (grades 9 and 10) - exam at the end of 10th grade",
 "Board of Education - Central/Others",
-"Higher Secondary Education percentage - 12th Grade",
+"Higher Secondary Education (grades 11 and 12) - exam at the end of 12th grade",
 "Board of Education - Central/Others",
 "Specialization in Higher Secondary Education",
 "Degree Percentage",
-"Undergraduate(Degree type) - Field of degree education",
-"Work Experience",
-"Employability test percentage (conducted by college)",
-"Post Graduation(MBA)- Specialization",
+"Undergraduate (Degree type) - Field of degree education",
+"Work Experience - Yes/No",
+"Employability test Percentage (conducted by college)",
+"Post Graduation (MBA) - Specialization",
 "MBA percentage",
 "Status of placement - Placed/Not placed",
 "Salary offered by corporate to candidates")
 
-dataset_table <-as.data.frame(cbind(attribute,description))
+type <- c(
+"numeric",
+"factor",
+"numeric",
+"factor",
+"numeric",
+"factor",
+"factor",
+"numeric",
+"factor",
+"factor",
+"numeric",
+"factor",
+"numeric",
+"factor",
+"numeric")
 
-dataset_table %>%   kbl() %>%
+dataset_table <-as.data.frame(cbind(attribute, type, description))
+
+dataset_table %>%
+  kbl(align = c("r", "l", "l"))%>%
   kable_paper("hover", full_width = F)%>%
-  column_spec(1, bold = TRUE)
+  column_spec(1, bold = TRUE)%>%
+  column_spec(2, italic = TRUE)
 ```
 
 <table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
  <thead>
   <tr>
-   <th style="text-align:left;"> attribute </th>
+   <th style="text-align:right;"> attribute </th>
+   <th style="text-align:left;"> type </th>
    <th style="text-align:left;"> description </th>
   </tr>
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> sl_no </td>
+   <td style="text-align:right;font-weight: bold;"> sl_no </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
    <td style="text-align:left;"> Serial Number </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> gender </td>
+   <td style="text-align:right;font-weight: bold;"> gender </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
    <td style="text-align:left;"> Gender: Male='M', Female='F' </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> ssc_p </td>
-   <td style="text-align:left;"> Secondary Education percentage - 10th Grade </td>
+   <td style="text-align:right;font-weight: bold;"> ssc_p </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
+   <td style="text-align:left;"> Secondary Education Percentage (grades 9 and 10) - exam at the end of 10th grade </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> ssc_b </td>
+   <td style="text-align:right;font-weight: bold;"> ssc_b </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
    <td style="text-align:left;"> Board of Education - Central/Others </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> hsc_p </td>
-   <td style="text-align:left;"> Higher Secondary Education percentage - 12th Grade </td>
+   <td style="text-align:right;font-weight: bold;"> hsc_p </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
+   <td style="text-align:left;"> Higher Secondary Education (grades 11 and 12) - exam at the end of 12th grade </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> hsc_b </td>
+   <td style="text-align:right;font-weight: bold;"> hsc_b </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
    <td style="text-align:left;"> Board of Education - Central/Others </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> hsc_s </td>
+   <td style="text-align:right;font-weight: bold;"> hsc_s </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
    <td style="text-align:left;"> Specialization in Higher Secondary Education </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> degree_p </td>
+   <td style="text-align:right;font-weight: bold;"> degree_p </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
    <td style="text-align:left;"> Degree Percentage </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> degree_t </td>
-   <td style="text-align:left;"> Undergraduate(Degree type) - Field of degree education </td>
+   <td style="text-align:right;font-weight: bold;"> degree_t </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
+   <td style="text-align:left;"> Undergraduate (Degree type) - Field of degree education </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> workex </td>
-   <td style="text-align:left;"> Work Experience </td>
+   <td style="text-align:right;font-weight: bold;"> workex </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
+   <td style="text-align:left;"> Work Experience - Yes/No </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> etest_p </td>
-   <td style="text-align:left;"> Employability test percentage (conducted by college) </td>
+   <td style="text-align:right;font-weight: bold;"> etest_p </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
+   <td style="text-align:left;"> Employability test Percentage (conducted by college) </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> specialisation </td>
-   <td style="text-align:left;"> Post Graduation(MBA)- Specialization </td>
+   <td style="text-align:right;font-weight: bold;"> specialisation </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
+   <td style="text-align:left;"> Post Graduation (MBA) - Specialization </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> mba_p </td>
+   <td style="text-align:right;font-weight: bold;"> mba_p </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
    <td style="text-align:left;"> MBA percentage </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> status </td>
+   <td style="text-align:right;font-weight: bold;"> status </td>
+   <td style="text-align:left;font-style: italic;"> factor </td>
    <td style="text-align:left;"> Status of placement - Placed/Not placed </td>
   </tr>
   <tr>
-   <td style="text-align:left;font-weight: bold;"> salary </td>
+   <td style="text-align:right;font-weight: bold;"> salary </td>
+   <td style="text-align:left;font-style: italic;"> numeric </td>
    <td style="text-align:left;"> Salary offered by corporate to candidates </td>
   </tr>
 </tbody>
@@ -173,7 +225,7 @@ dataset_table %>%   kbl() %>%
 
 ```r
 #clear variables from environment
-rm(attribute, description, dataset_table)
+rm(attribute, type, description, dataset_table)
 ```
 
 
@@ -186,7 +238,8 @@ Check for *NULL*s:
 raw_data %>% summarise_all(~ sum(is.null(.))) %>% sum() %>% 
   kbl(col.names = "Number of NULLs",
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(1, color = "green", bold = TRUE)
 ```
 
 <table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
@@ -197,7 +250,7 @@ raw_data %>% summarise_all(~ sum(is.null(.))) %>% sum() %>%
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:center;"> 0 </td>
+   <td style="text-align:center;font-weight: bold;color: green !important;"> 0 </td>
   </tr>
 </tbody>
 </table>
@@ -212,7 +265,8 @@ Check for *NA*s:
 raw_data %>% summarise_all(~ sum(is.na(.))) %>% sum() %>%
     kbl(col.names = "Number of NAs",
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(1, color = "red", bold = TRUE)
 ```
 
 <table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
@@ -223,7 +277,7 @@ raw_data %>% summarise_all(~ sum(is.na(.))) %>% sum() %>%
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:center;"> 67 </td>
+   <td style="text-align:center;font-weight: bold;color: red !important;"> 67 </td>
   </tr>
 </tbody>
 </table>
@@ -237,7 +291,9 @@ Let's dig deeper and see why we have 67 NAs.
 #we have 67 NAs - let's see which category has these values
 raw_data %>% summarise_all(~ sum(is.na(.))) %>%
     kbl()%>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  column_spec(15, color = "red", bold = TRUE)%>%
+  column_spec(1:14, color = "green", bold = TRUE)
 ```
 
 <table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
@@ -262,21 +318,21 @@ raw_data %>% summarise_all(~ sum(is.na(.))) %>%
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: green !important;"> 0 </td>
+   <td style="text-align:right;font-weight: bold;color: red !important;"> 67 </td>
   </tr>
 </tbody>
 </table>
@@ -291,7 +347,9 @@ Lastly, we need to check why we have these 67 NAs in the salary category. Is thi
 raw_data %>% group_by(status) %>% count() %>%     
   kbl(col.names = c("Status", "n"),
       align = c("c", "c")) %>%
-  kable_paper("hover", full_width = F)
+  kable_paper("hover", full_width = F)%>%
+  row_spec(1, color = "red", bold = TRUE)%>%
+  row_spec(2, color = "green", bold = TRUE)
 ```
 
 <table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
@@ -303,12 +361,12 @@ raw_data %>% group_by(status) %>% count() %>%
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:center;"> Not Placed </td>
-   <td style="text-align:center;"> 67 </td>
+   <td style="text-align:center;font-weight: bold;color: red !important;"> Not Placed </td>
+   <td style="text-align:center;font-weight: bold;color: red !important;"> 67 </td>
   </tr>
   <tr>
-   <td style="text-align:center;"> Placed </td>
-   <td style="text-align:center;"> 148 </td>
+   <td style="text-align:center;font-weight: bold;color: green !important;"> Placed </td>
+   <td style="text-align:center;font-weight: bold;color: green !important;"> 148 </td>
   </tr>
 </tbody>
 </table>
@@ -321,6 +379,12 @@ It looks like we have 67 NAs in the salary column due to the fact that 67 studen
 
 
 ## Correlation plot
+
+
+**Key findings**:
+
+* we can observe **medium correlations between the academic scores**. This suggests that students who performed well in secondary school were likely to also perform well within further education (higher secondary, university and MBA)
+* interestingly, **employability test scores only had a low correlation with academic scores**. **Perhaps**, this suggests that these tests were more practical than theoretical
 
 
 
@@ -361,13 +425,13 @@ rm(corr, p.mat, raw_data_corr)
 ```
 
 
+## Grade distribution {.tabset .tabset-fade .tabset-pills}
+
+
 **Key findings**:
 
-* we can observe **medium correlations between the academic scores**. This suggests that students who performed well in secondary school were likely to also perform well within further education (high school, university and MBA)
-* interestingly, **employability test scores only had a low correlation with academic scores**. Perhaps, this suggests that these tests were more practical than theoretical?
-
-
-## Grade distribution {.tabset .tabset-fade .tabset-pills}
+* the distribution becomes more concentated around the median (60-70) as a student progresses in their education, **from secondary** (wide distribution) **to MBA** (narrow distribution)
+* the **employability test** has a different trend, with a very wide and almost equal distribution of each score group
 
 
 ### secondary {-}
@@ -388,7 +452,7 @@ raw_data %>%
 <img src="figures/unnamed-chunk-9-1.png" width="100%" />
 
 
-### high school {-}
+### higher secondary {-}
 
 
 
@@ -460,12 +524,13 @@ raw_data %>%
 <img src="figures/unnamed-chunk-13-1.png" width="100%" />
 
 
-We can see that the distribution is more concentated around the median as a student progresses in their education, from secondary school (wide distribution) to MBA (narrow distribution).
-
-The employability test has a different trend, with a very wide and almost equal distribution of each score group.
-
-
 ## Are there any gender-specific differences in performance scores? {.tabset .tabset-fade .tabset-pills}
+
+
+**Key findings**:
+
+* females scored significantly higher than men at **university** and **MBA** level
+* no significant differences in performance during **secondary**, **higher secondary** and **employability test**
 
 
 ### university {-}
@@ -582,13 +647,26 @@ t_test_mba %>%
 </table>
 
 
-There were no significant differences in performance during secondary, high school and employability test.
-
-
-Next, we would like to know if these differences led to a better chance of receiving a placement role.
-
-
 ## Did the academic peformance help in receiving an offer? {.tabset .tabset-fade .tabset-pills}
+
+
+Since we know that the results got more concentrated around the median (60-70) as the student progressed in their education, we could infer that there was less of a chance to differentiate themselves based on grade and more based on other factors such as:
+* *employability score*
+* *work experience*
+* *technical skills*
+* *soft skills*
+* *better interviewing skills*
+
+Unfortunately, out of these factors, we only have data on the employability score.
+
+
+**Key findings**:
+
+The score differences between those who received an offer and those who did not:
+
+* were highly significant at the **secondary**, **higher secondary** and **university** level
+* significant at **employability test**
+* no significance at the **MBA** level
 
 
 ### secondary {-}
@@ -596,26 +674,61 @@ Next, we would like to know if these differences led to a better chance of recei
 
 
 ```r
-t_test <- raw_data%>%
+t_test <- raw_data %>%
   t_test(ssc_p ~ status)%>%
   add_significance()
 
 raw_data %>% 
   ggplot(aes(ssc_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-16-1.png" width="100%" />
 
+```r
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+```
 
-### high school {-}
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ssc_p </td>
+   <td style="text-align:left;"> Not Placed </td>
+   <td style="text-align:left;"> Placed </td>
+   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;"> 148 </td>
+   <td style="text-align:right;"> -11.33316 </td>
+   <td style="text-align:right;"> 132.0192 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> **** </td>
+  </tr>
+</tbody>
+</table>
+
+
+### higher secondary {-}
 
 
 
@@ -626,17 +739,52 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(hsc_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-17-1.png" width="100%" />
+
+```r
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> hsc_p </td>
+   <td style="text-align:left;"> Not Placed </td>
+   <td style="text-align:left;"> Placed </td>
+   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;"> 148 </td>
+   <td style="text-align:right;"> -8.043664 </td>
+   <td style="text-align:right;"> 120.8047 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> **** </td>
+  </tr>
+</tbody>
+</table>
 
 
 ### university {-}
@@ -650,17 +798,52 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(degree_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-18-1.png" width="100%" />
+
+```r
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> degree_p </td>
+   <td style="text-align:left;"> Not Placed </td>
+   <td style="text-align:left;"> Placed </td>
+   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;"> 148 </td>
+   <td style="text-align:right;"> -8.054153 </td>
+   <td style="text-align:right;"> 130.335 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> **** </td>
+  </tr>
+</tbody>
+</table>
 
 
 ### MBA {-}
@@ -674,17 +857,52 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(mba_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-19-1.png" width="100%" />
+
+```r
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> mba_p </td>
+   <td style="text-align:left;"> Not Placed </td>
+   <td style="text-align:left;"> Placed </td>
+   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;"> 148 </td>
+   <td style="text-align:right;"> -1.139201 </td>
+   <td style="text-align:right;"> 131.2069 </td>
+   <td style="text-align:right;"> 0.257 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+</tbody>
+</table>
 
 
 ### employability (non-academic) {-}
@@ -698,24 +916,61 @@ t_test <- raw_data%>%
 
 raw_data %>% 
   ggplot(aes(etest_p, fill=status, col = status))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(x = "Score",
+       y = "Density",
+       col = "Status")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-20-1.png" width="100%" />
 
+```r
+t_test %>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+```
 
-Knowing that the results got more concentrated around the mean, we could maybe infer that there was less of a chance for a student to differentiate themselves based on grade, and more based on other factors such as employability score, work experience, technical skills, soft skills, better interviews, etc. Unfortunately, out of these factors, we only have data on the employability score.
-
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> etest_p </td>
+   <td style="text-align:left;"> Not Placed </td>
+   <td style="text-align:left;"> Placed </td>
+   <td style="text-align:right;"> 67 </td>
+   <td style="text-align:right;"> 148 </td>
+   <td style="text-align:right;"> -1.980112 </td>
+   <td style="text-align:right;"> 145.392 </td>
+   <td style="text-align:right;"> 0.0496 </td>
+   <td style="text-align:left;"> * </td>
+  </tr>
+</tbody>
+</table>
 
 
 ## Did the different boards make a significant difference in school peformance/placement offer? {.tabset .tabset-fade .tabset-pills}
+
+
+**Key findings**:
+
+* no significant differences in school performance between the two boards at either **secondary** or **higher secondary** level
+* there was also no significant difference in the number of people that received an offer from either board at the **secondary** or **higher secondary** level
 
 
 ### secondary {-}
@@ -723,117 +978,312 @@ Knowing that the results got more concentrated around the mean, we could maybe i
 
 
 ```r
-t_test <- raw_data%>%
-  t_test(ssc_p ~ ssc_b)%>%
-  add_significance()
-
+#vs performance
 raw_data %>% 
   ggplot(aes(ssc_p, fill=ssc_b, col = ssc_b))+
-  geom_density(alpha = 0.2, show.legend = FALSE)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Density")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-21-1.png" width="100%" />
 
 ```r
-#fix this
+#t-test
+t_test <- raw_data%>%
+  t_test(ssc_p ~ ssc_b)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ssc_p </td>
+   <td style="text-align:left;"> Central </td>
+   <td style="text-align:left;"> Others </td>
+   <td style="text-align:right;"> 116 </td>
+   <td style="text-align:right;"> 99 </td>
+   <td style="text-align:right;"> -1.690651 </td>
+   <td style="text-align:right;"> 197.3488 </td>
+   <td style="text-align:right;"> 0.0925 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+#vs placement
 raw_data %>% 
   ggplot(aes(ssc_b, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Board",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-21-2.png" width="100%" />
 
+```r
+#categorical variables
+chisq.test(table(raw_data$ssc_b, raw_data$status))
+```
 
-### high school {-}
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity correction
+## 
+## data:  table(raw_data$ssc_b, raw_data$status)
+## X-squared = 0.15933, df = 1, p-value = 0.6898
+```
+
+
+### higher secondary {-}
 
 
 
 ```r
-t_test <- raw_data%>%
-  t_test(hsc_p ~ hsc_b)%>%
-  add_significance()
-
+#vs performance
 raw_data %>% 
-  ggplot(aes(hsc_p, fill=specialisation))+
-  geom_density(alpha = 0.2, show.legend = FALSE, col = "black")+
+  ggplot(aes(hsc_p, fill=hsc_b, col = hsc_b))+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Density")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-22-1.png" width="100%" />
 
 ```r
-#fix this
+#t-test for performance
+t_test <- raw_data%>%
+  t_test(hsc_p ~ hsc_b)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> hsc_p </td>
+   <td style="text-align:left;"> Central </td>
+   <td style="text-align:left;"> Others </td>
+   <td style="text-align:right;"> 84 </td>
+   <td style="text-align:right;"> 131 </td>
+   <td style="text-align:right;"> 0.2993721 </td>
+   <td style="text-align:right;"> 202.6011 </td>
+   <td style="text-align:right;"> 0.765 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+#vs placement
 raw_data %>% 
   ggplot(aes(hsc_b, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Board",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-22-2.png" width="100%" />
 
+```r
+#categorical variables
+chisq.test(table(raw_data$hsc_b, raw_data$status))
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity correction
+## 
+## data:  table(raw_data$hsc_b, raw_data$status)
+## X-squared = 0.0095175, df = 1, p-value = 0.9223
+```
+
 
 ## Did the specialisation help in getting a role? {.tabset .tabset-fade .tabset-pills}
 
 
-### high school {-}
+**Key findings**:
+
+* **higher secondary**:
+  * Commerce students scored significantly lower than Science students
+  * no significant difference between any groups in placement offers (however, this might not be accurate given that there were only 11 students in Arts versus 113 in Commerce and 91 in Science)
+* **university**:
+  * Science and Technology students scored significantly higher than those in Others
+  * there were no significant differences between the different groups regarding as it regarded the amount of students that received an offer (results might not be accurate due to a very low sample sample size in Others of 11 versus 145 in Commerce and Management and 59 in Science and Technology)
+* **MBA**:
+  * there were no significant differences in performance between the two groups
+  * significantly more Marketing and Finance students received an offer when compared to those specialised in Marketing and HR
+
+
+### higher secondary {-}
 
 
 
 ```r
-t_test <- raw_data%>%
-  t_test(hsc_p ~ hsc_s)%>%
-  add_significance()
-
+#vs performance
 raw_data %>% 
-  ggplot(aes(hsc_p, hsc_s, fill=hsc_s))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  ggplot(aes(hsc_p, hsc_s, fill=hsc_s, col = hsc_s))+
+  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Specialisation")+
+  theme(legend.position = "none")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-23-1.png" width="100%" />
 
 ```r
+#t-test
+t_test <- raw_data%>%
+  t_test(hsc_p ~ hsc_s)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:right;"> p.adj </th>
+   <th style="text-align:left;"> p.adj.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> hsc_p </td>
+   <td style="text-align:left;"> Arts </td>
+   <td style="text-align:left;"> Commerce </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 113 </td>
+   <td style="text-align:right;"> -1.6172999 </td>
+   <td style="text-align:right;"> 11.57211 </td>
+   <td style="text-align:right;"> 0.133000 </td>
+   <td style="text-align:right;"> 0.266000 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsc_p </td>
+   <td style="text-align:left;"> Arts </td>
+   <td style="text-align:left;"> Science </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 91 </td>
+   <td style="text-align:right;"> -0.1837289 </td>
+   <td style="text-align:right;"> 11.60227 </td>
+   <td style="text-align:right;"> 0.857000 </td>
+   <td style="text-align:right;"> 0.857000 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsc_p </td>
+   <td style="text-align:left;"> Commerce </td>
+   <td style="text-align:left;"> Science </td>
+   <td style="text-align:right;"> 113 </td>
+   <td style="text-align:right;"> 91 </td>
+   <td style="text-align:right;"> 3.7950536 </td>
+   <td style="text-align:right;"> 199.16642 </td>
+   <td style="text-align:right;"> 0.000196 </td>
+   <td style="text-align:right;"> 0.000588 </td>
+   <td style="text-align:left;"> *** </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+#vs placement
 raw_data %>% 
   ggplot(aes(hsc_s, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-23-2.png" width="100%" />
+
+```r
+#categorical variables
+chisq.test(table(raw_data$hsc_s, raw_data$status))
+```
+
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  table(raw_data$hsc_s, raw_data$status)
+## X-squared = 1.1147, df = 2, p-value = 0.5727
+```
 
 
 ### university {-}
@@ -841,36 +1291,115 @@ raw_data %>%
 
 
 ```r
-t_test <- raw_data%>%
-  t_test(degree_p ~ degree_t)%>%
-  add_significance()
-
+#vs performance
 raw_data %>% 
-  ggplot(aes(degree_p, degree_t, fill=degree_t))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  ggplot(aes(degree_p, degree_t, fill=degree_t, col = degree_t))+
+  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
+  labs(col = "Board",
+       x = "Score",
+       y = "Specialisation")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-24-1.png" width="100%" />
 
 ```r
+#t-test
+t_test <- raw_data%>%
+  t_test(degree_p ~ degree_t)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:right;"> p.adj </th>
+   <th style="text-align:left;"> p.adj.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> degree_p </td>
+   <td style="text-align:left;"> Comm.Mgmt </td>
+   <td style="text-align:left;"> Others </td>
+   <td style="text-align:right;"> 145 </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 2.368039 </td>
+   <td style="text-align:right;"> 11.49141 </td>
+   <td style="text-align:right;"> 0.036 </td>
+   <td style="text-align:right;"> 0.073 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> degree_p </td>
+   <td style="text-align:left;"> Comm.Mgmt </td>
+   <td style="text-align:left;"> Sci.Tech </td>
+   <td style="text-align:right;"> 145 </td>
+   <td style="text-align:right;"> 59 </td>
+   <td style="text-align:right;"> -1.496971 </td>
+   <td style="text-align:right;"> 111.72355 </td>
+   <td style="text-align:right;"> 0.137 </td>
+   <td style="text-align:right;"> 0.137 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> degree_p </td>
+   <td style="text-align:left;"> Others </td>
+   <td style="text-align:left;"> Sci.Tech </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 59 </td>
+   <td style="text-align:right;"> -2.946941 </td>
+   <td style="text-align:right;"> 13.47624 </td>
+   <td style="text-align:right;"> 0.011 </td>
+   <td style="text-align:right;"> 0.033 </td>
+   <td style="text-align:left;"> * </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+#vs placement
 raw_data %>% 
   ggplot(aes(degree_t, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-24-2.png" width="100%" />
+
+```r
+#categorical variables
+chisq.test(table(raw_data$degree_t, raw_data$status))
+```
+
+```
+## 
+## 	Pearson's Chi-squared test
+## 
+## data:  table(raw_data$degree_t, raw_data$status)
+## X-squared = 2.969, df = 2, p-value = 0.2266
+```
 
 
 ### MBA {-}
@@ -878,77 +1407,162 @@ raw_data %>%
 
 
 ```r
-t_test <- raw_data%>%
-  t_test(mba_p ~ specialisation)%>%
-  add_significance()
-
+#vs performance
 raw_data %>% 
-  ggplot(aes(mba_p, specialisation, fill=specialisation, col = specialisation))+
-  geom_boxplot(show.legend = FALSE, col = "black")+
-  #theme(legend.position = "top")+
-  scale_fill_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  scale_colour_manual(values = c("#DC3220", "#40B0A6", "black"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  ggplot(aes(mba_p, fill=specialisation, col = specialisation))+
+  geom_boxplot(alpha = 0.3, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Specialisation",
+       x = "Score",
+       y = "Density")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-25-1.png" width="100%" />
 
 ```r
+#t-test
+t_test <- raw_data%>%
+  t_test(mba_p ~ specialisation)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> mba_p </td>
+   <td style="text-align:left;"> Mkt.Fin </td>
+   <td style="text-align:left;"> Mkt.HR </td>
+   <td style="text-align:right;"> 120 </td>
+   <td style="text-align:right;"> 95 </td>
+   <td style="text-align:right;"> 1.568831 </td>
+   <td style="text-align:right;"> 208.8404 </td>
+   <td style="text-align:right;"> 0.118 </td>
+   <td style="text-align:left;"> ns </td>
+  </tr>
+</tbody>
+</table>
+
+```r
+#vs placement
 raw_data %>% 
   ggplot(aes(specialisation, fill = status))+
-  geom_bar(show.legend = FALSE, position = "fill", col = "black")+
-  #theme(legend.position = "top")+
+  geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
   scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
-  labs(title = "While a high employability score does not guarantee a placement, it does help",
-       subtitle = paste("The students placed a role had significantly (", t_test$p.signif, ") fewer low scores and more high scores than those who did not"))+
+  labs(fill = "Status",
+       x = "Specialisation",
+       y = "Percentage of students")+
+  scale_y_continuous(label = percent)+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-25-2.png" width="100%" />
 
+```r
+#categorical variables
+chisq.test(table(raw_data$specialisation, raw_data$status))
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity correction
+## 
+## data:  table(raw_data$specialisation, raw_data$status)
+## X-squared = 12.44, df = 1, p-value = 0.0004202
+```
+
 
 ## Is there a difference between the two genders in getting a placement?
 
 
+**Key findings**:
+
+* there were no significant differences in gender between the students that received a role and those that did not
+
+
 
 ```r
+#graph
 raw_data %>%
   group_by(gender, status)%>%
-  summarise(count = n())%>%
-  mutate(percentage = round(count/sum(count),2)*100)%>%
-        
-  ggplot(aes(status, percentage, fill = status))+
-  geom_col(position = "dodge", col = "black")+
-  geom_label(aes(label = paste(percentage, "%")), show.legend = FALSE)+
+  summarise(count = n()/100)%>%
+  mutate(percentage = round(count/sum(count),2))%>%
+  
+ggplot(aes(gender, count, fill = status))+
+  geom_col(position = "fill", col = "black")+
+  geom_label(aes(x=gender, 
+                 y = ifelse(percentage>.5, percentage - .25, percentage + .5), 
+                 label = paste(percentage*100, "%")), 
+             show.legend = FALSE)+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  facet_wrap(.~gender)+
-  labs(title = "A higher proportion of females failed to receive a placement than males, \ndespite females performing better at university and MBA",
-       x = NULL,
-       y = "Number of students",
-       fill = "Status")+
+  scale_y_continuous(label = percent)+
+  labs(x = "Gender",
+       y = "% of students",
+       fill = "Status",
+       subtitle = "Proportionaly, more males were offered a role but this was not statistically significant")+
   theme_few()
 ```
 
 <img src="figures/unnamed-chunk-26-1.png" width="100%" />
 
+```r
+#categorical variables
+chisq.test(table(raw_data$gender, raw_data$status)) %>% print()
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity correction
+## 
+## data:  table(raw_data$gender, raw_data$status)
+## X-squared = 1.3818, df = 1, p-value = 0.2398
+```
+
 
 ## Does work experience matter in getting a role?
 
 
+**Key findings**:
+
+* significantly more students with work experience received offers than those without any work experience
+
+
 
 ```r
+#graph
 raw_data %>% group_by(workex, status)%>% 
   summarise(count = n())%>%
-  mutate(perc = round(count / sum(count),2)*100,
-         diff = perc - 50)%>%
+  mutate(percentage = round(count / sum(count),2))%>%
         
-  ggplot(aes(workex, perc, fill = status))+
+  ggplot(aes(workex, percentage, fill = status))+
   geom_col(col = "black")+
   scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
-  geom_label(aes(label = paste(perc, "%"), y = 55 - diff), show.legend = FALSE)+
+  geom_label(aes(x=workex, 
+                 y = ifelse(percentage>.46, percentage - .25, 
+                            ifelse(percentage>.65, -.20, 
+                                   .92)), 
+                 label = paste(percentage*100, "%")), 
+             show.legend = FALSE)+
   labs(title = "Work experience significantly increases the chance of getting placed",
        subtitle = "87% of peple with work experience were placed versus 60% of those without work experience",
        x = "Work Experience",
@@ -961,6 +1575,19 @@ raw_data %>% group_by(workex, status)%>%
 
 <img src="figures/unnamed-chunk-27-1.png" width="100%" />
 
+```r
+#categorical variables
+chisq.test(table(raw_data$workex, raw_data$status)) %>% print()
+```
+
+```
+## 
+## 	Pearson's Chi-squared test with Yates' continuity correction
+## 
+## data:  table(raw_data$workex, raw_data$status)
+## X-squared = 15.154, df = 1, p-value = 9.907e-05
+```
+
 
 # Classification
 
@@ -968,7 +1595,7 @@ raw_data %>% group_by(workex, status)%>%
 ## Data split
 
 
-Based on the previous Exploratory Data Analysis, we have no reason to believe that any of the features are insignificant, so none of them are to be removed from the modelling.
+Based on the previous Exploratory Data Analysis, we're not very clear on whether any of the features are insignificant, so none of them are to be removed from the modelling.
 
 Let's split the dataset into the following:
 
@@ -982,7 +1609,7 @@ set.seed(123)
 
 #clean model data
 raw_data_model <- raw_data %>%
-  select(-sl_no, -salary)%>%
+  select(-salary)%>%
   mutate(status = as.factor(make.names(status)))
 
 #split into two datasets
@@ -1021,20 +1648,19 @@ Let's use some basic standardisation offered by the caret package such as **cent
 
 
 ```r
-#store the y variable in its original format
-#y <- train_data$status
+#store the ID variable in its original format
+y_test <- test_data$sl_no
+y_train <- train_data$sl_no
 
 #take out y variable temporarily as we do not want this to be processed
-#train_data <- train_data %>% select (-status)
+test_data <- test_data %>% select (-sl_no)
+train_data <- train_data %>% select (-sl_no)
 
 #center and scale our data
 preProcess_range_model <- preProcess(train_data, method=c("center", "scale"))
 
 train_data <- predict(preProcess_range_model, newdata = train_data)
 test_data <- predict(preProcess_range_model, newdata = test_data)
- 
-#Append the Y variable back on with original values
-#train_data$status <- y
 ```
 
 
@@ -1051,7 +1677,7 @@ Essentially, we are "pretending" that some of our data is new and use the rest o
 train.control <- trainControl(method = "repeatedcv", 
                               number = 10, #10
                               repeats = 5, #5
-                              search = "random",
+                              #search = "random",
                               classProbs = T)
 
 tune.Length <- 10
@@ -1343,28 +1969,28 @@ confusionMatrix(preds, test_data$status)
 ## 
 ##             Reference
 ## Prediction   Not.Placed Placed
-##   Not.Placed          8      1
-##   Placed              5     28
-##                                           
-##                Accuracy : 0.8571          
-##                  95% CI : (0.7146, 0.9457)
-##     No Information Rate : 0.6905          
-##     P-Value [Acc > NIR] : 0.01118         
-##                                           
-##                   Kappa : 0.6348          
-##                                           
-##  Mcnemar's Test P-Value : 0.22067         
-##                                           
-##             Sensitivity : 0.6154          
-##             Specificity : 0.9655          
-##          Pos Pred Value : 0.8889          
-##          Neg Pred Value : 0.8485          
-##              Prevalence : 0.3095          
-##          Detection Rate : 0.1905          
-##    Detection Prevalence : 0.2143          
-##       Balanced Accuracy : 0.7905          
-##                                           
-##        'Positive' Class : Not.Placed      
+##   Not.Placed          6      1
+##   Placed              7     28
+##                                          
+##                Accuracy : 0.8095         
+##                  95% CI : (0.6588, 0.914)
+##     No Information Rate : 0.6905         
+##     P-Value [Acc > NIR] : 0.06218        
+##                                          
+##                   Kappa : 0.4894         
+##                                          
+##  Mcnemar's Test P-Value : 0.07710        
+##                                          
+##             Sensitivity : 0.4615         
+##             Specificity : 0.9655         
+##          Pos Pred Value : 0.8571         
+##          Neg Pred Value : 0.8000         
+##              Prevalence : 0.3095         
+##          Detection Rate : 0.1429         
+##    Detection Prevalence : 0.1667         
+##       Balanced Accuracy : 0.7135         
+##                                          
+##        'Positive' Class : Not.Placed     
 ## 
 ```
 
@@ -1373,76 +1999,9 @@ confusionMatrix(preds, test_data$status)
 
 
 
-```r
-#run them all in paralel
-cl <- makeCluster(clusters, type = "SOCK")
-
-#register cluster train in paralel
-registerDoSNOW(cl)
-
-#train model
-model_xgb <- train(status ~ .,
-                   data = train_data,
-                   method = "xgbTree",
-                   trControl = train.control,
-                   tuneLength = tune.Length)
-
-#shut the instances of R down
-stopCluster(cl)
-
-#show results
-summary(model_xgb)
-
-#get info
-#names(model_xgb)
-
-#AccuracySD
-model_xgb$results #gives us an esitmate of the uncertainty in our accuracy estimate
-
-#add prediction column to test dataset
-test_data$xgb <- predict(model_xgb, newdata = test_data)
-
-#get probabilities instead
-head(predict(model_xgb, newdata = test_data, type = "prob"))
-```
 
 
 
-```r
-preds <- predict(model_xgb, newdata = test_data)
-
-confusionMatrix(preds, test_data$status)
-```
-
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   Not.Placed Placed
-##   Not.Placed          5      1
-##   Placed              8     28
-##                                          
-##                Accuracy : 0.7857         
-##                  95% CI : (0.6319, 0.897)
-##     No Information Rate : 0.6905         
-##     P-Value [Acc > NIR] : 0.1194         
-##                                          
-##                   Kappa : 0.4112         
-##                                          
-##  Mcnemar's Test P-Value : 0.0455         
-##                                          
-##             Sensitivity : 0.3846         
-##             Specificity : 0.9655         
-##          Pos Pred Value : 0.8333         
-##          Neg Pred Value : 0.7778         
-##              Prevalence : 0.3095         
-##          Detection Rate : 0.1190         
-##    Detection Prevalence : 0.1429         
-##       Balanced Accuracy : 0.6751         
-##                                          
-##        'Positive' Class : Not.Placed     
-## 
-```
 
 
 ### 6 - KNN {-}
@@ -1495,26 +2054,26 @@ confusionMatrix(preds, test_data$status)
 ## 
 ##             Reference
 ## Prediction   Not.Placed Placed
-##   Not.Placed          5      0
-##   Placed              8     29
+##   Not.Placed          5      1
+##   Placed              8     28
 ##                                          
-##                Accuracy : 0.8095         
-##                  95% CI : (0.6588, 0.914)
+##                Accuracy : 0.7857         
+##                  95% CI : (0.6319, 0.897)
 ##     No Information Rate : 0.6905         
-##     P-Value [Acc > NIR] : 0.06218        
+##     P-Value [Acc > NIR] : 0.1194         
 ##                                          
-##                   Kappa : 0.4633         
+##                   Kappa : 0.4112         
 ##                                          
-##  Mcnemar's Test P-Value : 0.01333        
+##  Mcnemar's Test P-Value : 0.0455         
 ##                                          
 ##             Sensitivity : 0.3846         
-##             Specificity : 1.0000         
-##          Pos Pred Value : 1.0000         
-##          Neg Pred Value : 0.7838         
+##             Specificity : 0.9655         
+##          Pos Pred Value : 0.8333         
+##          Neg Pred Value : 0.7778         
 ##              Prevalence : 0.3095         
 ##          Detection Rate : 0.1190         
-##    Detection Prevalence : 0.1190         
-##       Balanced Accuracy : 0.6923         
+##    Detection Prevalence : 0.1429         
+##       Balanced Accuracy : 0.6751         
 ##                                          
 ##        'Positive' Class : Not.Placed     
 ## 
@@ -1604,76 +2163,9 @@ confusionMatrix(preds, test_data$status)
 
 
 
-```r
-#run them all in paralel
-cl <- makeCluster(clusters, type = "SOCK")
-
-#register cluster train in paralel
-registerDoSNOW(cl)
-
-#train model
-model_xgbDART <- train(status ~ .,
-                       data = train_data,
-                       method = "xgbDART",
-                       trControl = train.control,
-                       tuneLength = tune.Length)
-
-#shut the instances of R down
-stopCluster(cl)
-
-#show results
-summary(model_xgbDART)
-
-#get info
-#names(model_xgbDART)
-
-#AccuracySD
-model_xgbDART$results #gives us an esitmate of the uncertainty in our accuracy estimate
-
-#add prediction column to test dataset
-test_data$xgbDART <- predict(model_xgbDART, newdata = test_data)
-
-#get probabilities instead
-head(predict(model_xgbDART, newdata = test_data, type = "prob"))
-```
 
 
 
-```r
-preds <- predict(model_xgbDART, newdata = test_data)
-
-confusionMatrix(preds, test_data$status)
-```
-
-```
-## Confusion Matrix and Statistics
-## 
-##             Reference
-## Prediction   Not.Placed Placed
-##   Not.Placed          5      0
-##   Placed              8     29
-##                                          
-##                Accuracy : 0.8095         
-##                  95% CI : (0.6588, 0.914)
-##     No Information Rate : 0.6905         
-##     P-Value [Acc > NIR] : 0.06218        
-##                                          
-##                   Kappa : 0.4633         
-##                                          
-##  Mcnemar's Test P-Value : 0.01333        
-##                                          
-##             Sensitivity : 0.3846         
-##             Specificity : 1.0000         
-##          Pos Pred Value : 1.0000         
-##          Neg Pred Value : 0.7838         
-##              Prevalence : 0.3095         
-##          Detection Rate : 0.1190         
-##    Detection Prevalence : 0.1190         
-##       Balanced Accuracy : 0.6923         
-##                                          
-##        'Positive' Class : Not.Placed     
-## 
-```
 
 
 ### 9 - Random Forrest (rf) {-}
@@ -1839,9 +2331,9 @@ models_compare <- resamples(list(glm=model_glm,
                                  rpart = model_rpart,
                                  ranger = model_ranger,
                                  svm = model_svm,
-                                 xgb = model_xgb,
+                                 #xgb = model_xgb,
                                  knn = model_knn,
-                                 xgbDART = model_xgbDART,
+                                 #xgbDART = model_xgbDART,
                                  rf = model_rf,
                                  mars = model_mars))
 
@@ -1866,34 +2358,30 @@ summary(models_compare)
 ## Call:
 ## summary.resamples(object = models_compare)
 ## 
-## Models: glm, lda2, rpart, ranger, svm, xgb, knn, xgbDART, rf, mars 
+## Models: glm, lda2, rpart, ranger, svm, knn, rf, mars 
 ## Number of resamples: 50 
 ## 
 ## Accuracy 
-##              Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-## glm     0.6666667 0.8259804 0.8823529 0.8780637 0.9402574 1.0000000    0
-## lda2    0.7058824 0.8235294 0.8823529 0.8695915 0.8888889 1.0000000    0
-## rpart   0.6470588 0.7679739 0.8235294 0.8219444 0.8823529 1.0000000    0
-## ranger  0.6470588 0.8235294 0.8823529 0.8671487 0.9411765 1.0000000    0
-## svm     0.7058824 0.8333333 0.8823529 0.8851225 0.9411765 1.0000000    0
-## xgb     0.6470588 0.7777778 0.8284314 0.8347467 0.8888889 1.0000000    0
-## knn     0.6111111 0.8152574 0.8284314 0.8431781 0.8888889 0.9444444    0
-## xgbDART 0.6666667 0.8235294 0.8823529 0.8576879 0.8888889 0.9444444    0
-## rf      0.7058824 0.8235294 0.8823529 0.8752533 0.9402574 1.0000000    0
-## mars    0.6666667 0.8235294 0.8823529 0.8519608 0.8888889 1.0000000    0
+##             Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+## glm    0.6666667 0.8259804 0.8823529 0.8780637 0.9402574    1    0
+## lda2   0.7058824 0.8235294 0.8823529 0.8750490 0.9411765    1    0
+## rpart  0.6470588 0.7777778 0.8333333 0.8419036 0.8888889    1    0
+## ranger 0.6666667 0.8259804 0.8823529 0.8726389 0.9411765    1    0
+## svm    0.6470588 0.8259804 0.8823529 0.8730229 0.9411765    1    0
+## knn    0.6111111 0.8235294 0.8541667 0.8454493 0.9281046    1    0
+## rf     0.6470588 0.8235294 0.8823529 0.8754412 0.9411765    1    0
+## mars   0.5882353 0.8235294 0.8333333 0.8577941 0.8888889    1    0
 ## 
 ## Kappa 
-##               Min.   1st Qu.    Median      Mean   3rd Qu.      Max. NA's
-## glm     0.25000000 0.6009928 0.7166667 0.7058227 0.8487066 1.0000000    0
-## lda2    0.33070866 0.5984252 0.7166667 0.6871909 0.7500000 1.0000000    0
-## rpart   0.14141414 0.4430783 0.5486726 0.5737722 0.7166667 1.0000000    0
-## ranger  0.03773585 0.4848485 0.6792453 0.6547975 0.8495575 1.0000000    0
-## svm     0.14141414 0.6086957 0.7272727 0.7209908 0.8495575 1.0000000    0
-## xgb     0.15000000 0.4545455 0.5984252 0.5878107 0.7272727 1.0000000    0
-## knn     0.00000000 0.4848485 0.5714286 0.5867360 0.7386364 0.8695652    0
-## xgbDART 0.24778761 0.5486726 0.6792453 0.6438340 0.7500000 0.8800000    0
-## rf      0.21052632 0.5984252 0.6792453 0.6870569 0.8651235 1.0000000    0
-## mars    0.25000000 0.5486726 0.6979560 0.6444819 0.7462687 1.0000000    0
+##               Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+## glm     0.25000000 0.6009928 0.7166667 0.7058227 0.8487066    1    0
+## lda2    0.28571429 0.5984252 0.6979560 0.7026152 0.8495575    1    0
+## rpart   0.14141414 0.4545455 0.6086957 0.6024481 0.7386364    1    0
+## ranger  0.10000000 0.5714286 0.6941681 0.6808215 0.8495575    1    0
+## svm     0.15000000 0.6009928 0.7128788 0.6903251 0.8495575    1    0
+## knn    -0.10526316 0.4848485 0.6439705 0.6043877 0.8246681    1    0
+## rf      0.00000000 0.5751232 0.7189891 0.6888634 0.8495575    1    0
+## mars    0.06299213 0.5543616 0.6086957 0.6599718 0.7490672    1    0
 ```
 
 ```r
@@ -1910,7 +2398,7 @@ b) if the second is favourable, then the Random Forrest might be a better altern
 ## LDA2 vs Ranger
 
 
-We can observe that there are no statistically significant differences between the two main models.
+We can observe that there are statistically significant differences between these two main models.
 
 
 
@@ -1923,13 +2411,13 @@ compare_models(model_lda2, model_ranger)
 ## 	One Sample t-test
 ## 
 ## data:  x
-## t = 0.17365, df = 49, p-value = 0.8629
+## t = 0.17129, df = 49, p-value = 0.8647
 ## alternative hypothesis: true mean is not equal to 0
 ## 95 percent confidence interval:
-##  -0.02582703  0.03071265
+##  -0.02586618  0.03068645
 ## sample estimates:
-##  mean of x 
-## 0.00244281
+##   mean of x 
+## 0.002410131
 ```
 
 
@@ -1942,7 +2430,7 @@ We can see the actual predictions of each model below.
 
 ```r
 test_data%>%
-  select(status, lda2, ranger, svm, glm, xgb, rf, knn, mars, xgbDART, rpart)%>%
+  select(status, lda2, ranger, svm, glm, rf, knn, mars, rpart)%>% #ensure these are filled in
   rename(Actual = status)%>%
   mutate(lda2 = ifelse(Actual == lda2, 
                       cell_spec(lda2, "html", color = "limegreen", bold = T), 
@@ -1956,9 +2444,9 @@ test_data%>%
          glm = ifelse(Actual == glm, 
                       cell_spec(glm, "html", color = "limegreen", bold = T), 
                       cell_spec(glm, "html", color = "red", bold = T)),
-         xgb = ifelse(Actual == xgb, 
-                      cell_spec(xgb, "html", color = "limegreen", bold = T), 
-                      cell_spec(xgb, "html", color = "red", bold = T)),
+         #xgb = ifelse(Actual == xgb, 
+         #             cell_spec(xgb, "html", color = "limegreen", bold = T), 
+         #             cell_spec(xgb, "html", color = "red", bold = T)),
          rf = ifelse(Actual == rf, 
                       cell_spec(rf, "html", color = "limegreen", bold = T), 
                       cell_spec(rf, "html", color = "red", bold = T)),
@@ -1968,9 +2456,9 @@ test_data%>%
          mars = ifelse(Actual == mars, 
                       cell_spec(mars, "html", color = "limegreen", bold = T), 
                       cell_spec(mars, "html", color = "red", bold = T)),
-         xgbDART = ifelse(Actual == xgbDART, 
-                      cell_spec(xgbDART, "html", color = "limegreen", bold = T), 
-                      cell_spec(xgbDART, "html", color = "red", bold = T)), 
+         #xgbDART = ifelse(Actual == xgbDART, 
+         #             cell_spec(xgbDART, "html", color = "limegreen", bold = T), 
+        #              cell_spec(xgbDART, "html", color = "red", bold = T)), 
          rpart = ifelse(Actual == rpart, 
                       cell_spec(rpart, "html", color = "limegreen", bold = T), 
                       cell_spec(rpart, "html", color = "red", bold = T))) %>%
@@ -1991,11 +2479,9 @@ test_data%>%
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> ranger </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> svm </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> glm </th>
-   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> xgb </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> rf </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> knn </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> mars </th>
-   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> xgbDART </th>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> rpart </th>
   </tr>
  </thead>
@@ -2010,13 +2496,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2036,26 +2518,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2075,13 +2540,20 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2101,12 +2573,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2115,7 +2584,6 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
@@ -2127,169 +2595,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2307,14 +2615,143 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2323,12 +2760,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2346,10 +2780,8 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
@@ -2361,13 +2793,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2387,13 +2815,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
@@ -2413,8 +2837,6 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
@@ -2426,15 +2848,11 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
@@ -2452,8 +2870,6 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
@@ -2461,8 +2877,6 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
@@ -2478,20 +2892,16 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
   </tr>
   <tr>
@@ -2504,26 +2914,9 @@ test_data%>%
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
@@ -2537,13 +2930,22 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
   </tr>
 </tbody>
@@ -2562,6 +2964,16 @@ We should investigate to see what's special about these two groups of students.
 
 
 Let's graph these students against the top 2-3 variables by importance and see if there are any trends
+
+
+```r
+#Append the Y variable back on with original values
+test_data$sl_no <- y_test  
+train_data$sl_no <- y_train
+
+#clear variables from memory
+rm(y_test, y_train)
+```
 
 
 
@@ -2597,21 +3009,15 @@ plot(model_rf,
 ## What were the most important variables?
 
 
-As calculated by the 2nd most accurate model, GLM, since SVM and Random Forrest do not support this function.
-
-
 
 ```r
 imp <- varImp(model_rf) #can also use glm here
 
 plot(imp, main = "Top variables ranked by importance",
-     sub = "s")
+     sub = "As calculated by the Random Forrest (rf) model")
 ```
 
 <img src="figures/factors-1.png" width="100%" />
-
-
-
 
 
 # Summary EDA:
@@ -2635,8 +3041,8 @@ plot(imp, main = "Top variables ranked by importance",
 
 
 
-Classification:
-* what do the probability estimates for each class tell us about the model's confidence? (51% vs 99%) - equivocal areas
+
+
 
 
 
@@ -2656,12 +3062,10 @@ FN             TN              28.4       -      Non-response
 
 4) combine proportion of the model
 
-
-* finish data exploration
 * read others' project and learn from them
 
+* what do the probability estimates for each class tell us about the model's confidence? (51% vs 99%) - equivocal areas
 
 * try and understand why it failed on those people that the model failed on
-
 
 - metric = "ROC"?
