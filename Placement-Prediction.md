@@ -542,13 +542,15 @@ t_test_degree <- raw_data%>%
   t_test(degree_p ~ gender)%>%
   add_significance()
 
-raw_data %>% ggplot(aes(gender, degree_p, fill = gender))+
-        geom_boxplot(varwidth = TRUE)+
+raw_data %>% ggplot(aes(degree_p, fill = gender, col = gender))+
+  geom_density(alpha = 0.3, lwd = 1, show.legend = FALSE)+
+  geom_rug()+
   scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
   labs(title = paste("Females scored significantly higher (", t_test_degree$p.signif, ") than males at the university level"),
-       fill = "Gender",
-       x = NULL,
-       y = "Score")+
+       col = "Gender",
+       x = "Score",
+       y = "Density")+
   theme_few()
 ```
 
@@ -599,13 +601,15 @@ t_test_mba <- raw_data%>%
   t_test(mba_p ~ gender)%>%
   add_significance()
 
-raw_data %>% ggplot(aes(gender, mba_p, fill = gender))+
-        geom_boxplot(varwidth = TRUE)+
+raw_data %>% ggplot(aes(mba_p, fill = gender, col = gender))+
+  geom_density(alpha = 0.3, lwd = 1, show.legend = FALSE)+
+  geom_rug()+
   scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
   labs(title = paste("Females scored significantly higher (", t_test_mba$p.signif, ") than males at the MBA level"),
-       fill = "Gender",
-       x = NULL,
-       y = "Score")+
+       col = "Gender",
+       x = "Score",
+       y = "Density")+
   theme_few()
 ```
 
@@ -1167,6 +1171,8 @@ chisq.test(table(raw_data$hsc_b, raw_data$status))
 * **MBA**:
   * there were no significant differences in performance between the two groups
   * significantly more Marketing and Finance students received an offer when compared to those specialised in Marketing and HR
+* **employabiity test**:
+  * Marketing and Finance students scored significantly better than Marketing and HR students
 
 
 ### higher secondary {-}
@@ -1176,14 +1182,14 @@ chisq.test(table(raw_data$hsc_b, raw_data$status))
 ```r
 #vs performance
 raw_data %>% 
-  ggplot(aes(hsc_p, hsc_s, fill=hsc_s, col = hsc_s))+
-  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  ggplot(aes(hsc_p, fill=hsc_s, col = hsc_s))+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
   scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
   scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
-  labs(col = "Board",
+  labs(col = "Specialisation",
        x = "Score",
-       y = "Specialisation")+
+       y = "Density")+
   theme(legend.position = "none")+
   theme_few()
 ```
@@ -1293,12 +1299,12 @@ chisq.test(table(raw_data$hsc_s, raw_data$status))
 ```r
 #vs performance
 raw_data %>% 
-  ggplot(aes(degree_p, degree_t, fill=degree_t, col = degree_t))+
-  geom_boxplot(alpha = 0.5, show.legend = FALSE, lwd = 1)+
+  ggplot(aes(degree_p, fill=degree_t, col = degree_t))+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
   scale_colour_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
   scale_fill_manual(values = c("#00AFBB", "#E69F00", "blueviolet"))+
-  labs(col = "Board",
+  labs(col = "Specialisation",
        x = "Score",
        y = "Specialisation")+
   theme_few()
@@ -1410,7 +1416,7 @@ chisq.test(table(raw_data$degree_t, raw_data$status))
 #vs performance
 raw_data %>% 
   ggplot(aes(mba_p, fill=specialisation, col = specialisation))+
-  geom_boxplot(alpha = 0.3, show.legend = FALSE, lwd = 1)+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
   scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
   scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
@@ -1492,6 +1498,67 @@ chisq.test(table(raw_data$specialisation, raw_data$status))
 ```
 
 
+### MBA - employability test {-}
+
+
+
+```r
+#vs performance (e-test)
+raw_data %>% 
+  ggplot(aes(etest_p, fill=specialisation, col = specialisation))+
+  geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
+  geom_rug()+
+  scale_colour_manual(values = c("#00AFBB", "#E69F00"))+
+  scale_fill_manual(values = c("#00AFBB", "#E69F00"))+
+  labs(col = "Specialisation",
+       x = "Score",
+       y = "Density")+
+  theme_few()
+```
+
+<img src="figures/unnamed-chunk-26-1.png" width="100%" />
+
+```r
+#t-test (e-test)
+t_test <- raw_data%>%
+  t_test(etest_p ~ specialisation)%>%
+  add_significance()%>%
+  kbl() %>%
+  kable_paper("hover", full_width = F)
+
+t_test
+```
+
+<table class=" lightable-paper lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> .y. </th>
+   <th style="text-align:left;"> group1 </th>
+   <th style="text-align:left;"> group2 </th>
+   <th style="text-align:right;"> n1 </th>
+   <th style="text-align:right;"> n2 </th>
+   <th style="text-align:right;"> statistic </th>
+   <th style="text-align:right;"> df </th>
+   <th style="text-align:right;"> p </th>
+   <th style="text-align:left;"> p.signif </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> etest_p </td>
+   <td style="text-align:left;"> Mkt.Fin </td>
+   <td style="text-align:left;"> Mkt.HR </td>
+   <td style="text-align:right;"> 120 </td>
+   <td style="text-align:right;"> 95 </td>
+   <td style="text-align:right;"> 3.636649 </td>
+   <td style="text-align:right;"> 212.8795 </td>
+   <td style="text-align:right;"> 0.000346 </td>
+   <td style="text-align:left;"> *** </td>
+  </tr>
+</tbody>
+</table>
+
+
 ## Is there a difference between the two genders in getting a placement?
 
 
@@ -1523,7 +1590,7 @@ ggplot(aes(gender, count, fill = status))+
   theme_few()
 ```
 
-<img src="figures/unnamed-chunk-26-1.png" width="100%" />
+<img src="figures/unnamed-chunk-27-1.png" width="100%" />
 
 ```r
 #categorical variables
@@ -1573,7 +1640,7 @@ raw_data %>% group_by(workex, status)%>%
         axis.text.y = element_blank())
 ```
 
-<img src="figures/unnamed-chunk-27-1.png" width="100%" />
+<img src="figures/unnamed-chunk-28-1.png" width="100%" />
 
 ```r
 #categorical variables
@@ -1878,6 +1945,9 @@ test_data$lda2 <- predict(model_lda2, newdata = test_data)
 
 #get probabilities instead
 head(predict(model_lda2, newdata = test_data, type = "prob"))
+
+#get probabilities
+lda2_prob <- predict(model_lda2, newdata = test_data, type = "prob")*100
 ```
 
 
@@ -1995,16 +2065,7 @@ confusionMatrix(preds, test_data$status)
 ```
 
 
-### 5 - xgboost {-}
-
-
-
-
-
-
-
-
-### 6 - KNN {-}
+### 5 - KNN {-}
 
 
 
@@ -2080,7 +2141,7 @@ confusionMatrix(preds, test_data$status)
 ```
 
 
-### 7 - Random Forrest (ranger) {-}
+### 6 - Random Forrest (ranger) {-}
 
 
 
@@ -2114,10 +2175,10 @@ model_ranger$results #gives us an esitmate of the uncertainty in our accuracy es
 test_data$ranger <- predict(model_ranger, newdata = test_data)
 
 #get probabilities instead
-#head(predict(model_ranger, newdata = test_data, type = "prob"))
+head(predict(model_ranger, newdata = test_data, type = "prob"))
 
-
-###----------------------------------why can we not predict?
+#get probabilities
+ranger_prob <- predict(model_ranger, newdata = test_data, type = "prob")*100
 ```
 
 
@@ -2159,16 +2220,7 @@ confusionMatrix(preds, test_data$status)
 ```
 
 
-### 8 - Extreme Gradient Boosting {-}
-
-
-
-
-
-
-
-
-### 9 - Random Forrest (rf) {-}
+### 7 - Random Forrest (rf) {-}
 
 
 
@@ -2244,7 +2296,7 @@ confusionMatrix(preds, test_data$status)
 ```
 
 
-### 10 - MARS {-}
+### 8 - MARS {-}
 
 
 
@@ -2320,7 +2372,19 @@ confusionMatrix(preds, test_data$status)
 ```
 
 
-## Which was the best model?
+## Which model should we use?
+
+
+#The xgbDART model appears to be the be best performing model overall because of the high ROC. But if you need a model that predicts the positives better, you might want to consider MARS, given its high sensitivity.
+
+
+**Key findings**:
+
+*overall, e also need to consider that while the SVM model was the most accurate, there is a difference between the type of error that a model can make
+*in other words, predicting that one person will get the job when they ended up not getting the job is not as bad as predicting that a person won't get the job when they will end up getting the job
+*asda
+  * **scenario a)** if the first case is seen as favourable, the SVM model is more appropriate because it has a higher overall accuracy as it cause **one false positive** and **three false positive**
+  * **scenario b)** if the second is favourable, then the Random Forrest might be a better alternative. While it had a lower overall accuracy, it did not cause any X errors
 
 
 
@@ -2331,9 +2395,7 @@ models_compare <- resamples(list(glm=model_glm,
                                  rpart = model_rpart,
                                  ranger = model_ranger,
                                  svm = model_svm,
-                                 #xgb = model_xgb,
                                  knn = model_knn,
-                                 #xgbDART = model_xgbDART,
                                  rf = model_rf,
                                  mars = model_mars))
 
@@ -2344,7 +2406,7 @@ scales <- list(x=list(relation="free"), y=list(relation="free"))
 bwplot(models_compare, scales=scales)
 ```
 
-<img src="figures/unnamed-chunk-52-1.png" width="100%" />
+<img src="figures/unnamed-chunk-49-1.png" width="100%" />
 
 
 
@@ -2369,30 +2431,20 @@ summary(models_compare)
 ## ranger 0.6666667 0.8259804 0.8823529 0.8726389 0.9411765    1    0
 ## svm    0.6470588 0.8259804 0.8823529 0.8730229 0.9411765    1    0
 ## knn    0.6111111 0.8235294 0.8541667 0.8454493 0.9281046    1    0
-## rf     0.6470588 0.8235294 0.8823529 0.8754412 0.9411765    1    0
-## mars   0.5882353 0.8235294 0.8333333 0.8577941 0.8888889    1    0
+## rf     0.7058824 0.8235294 0.8823529 0.8740686 0.9411765    1    0
+## mars   0.6666667 0.8235294 0.8578431 0.8566013 0.8888889    1    0
 ## 
 ## Kappa 
-##               Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
-## glm     0.25000000 0.6009928 0.7166667 0.7058227 0.8487066    1    0
-## lda2    0.28571429 0.5984252 0.6979560 0.7026152 0.8495575    1    0
-## rpart   0.14141414 0.4545455 0.6086957 0.6024481 0.7386364    1    0
-## ranger  0.10000000 0.5714286 0.6941681 0.6808215 0.8495575    1    0
-## svm     0.15000000 0.6009928 0.7128788 0.6903251 0.8495575    1    0
-## knn    -0.10526316 0.4848485 0.6439705 0.6043877 0.8246681    1    0
-## rf      0.00000000 0.5751232 0.7189891 0.6888634 0.8495575    1    0
-## mars    0.06299213 0.5543616 0.6086957 0.6599718 0.7490672    1    0
+##              Min.   1st Qu.    Median      Mean   3rd Qu. Max. NA's
+## glm     0.2500000 0.6009928 0.7166667 0.7058227 0.8487066    1    0
+## lda2    0.2857143 0.5984252 0.6979560 0.7026152 0.8495575    1    0
+## rpart   0.1414141 0.4545455 0.6086957 0.6024481 0.7386364    1    0
+## ranger  0.1000000 0.5714286 0.6941681 0.6808215 0.8495575    1    0
+## svm     0.1500000 0.6009928 0.7128788 0.6903251 0.8495575    1    0
+## knn    -0.1052632 0.4848485 0.6439705 0.6043877 0.8246681    1    0
+## rf      0.1414141 0.5781777 0.7128788 0.6870177 0.8495575    1    0
+## mars    0.1818182 0.5121681 0.6587716 0.6564610 0.7490672    1    0
 ```
-
-```r
-#The xgbDART model appears to be the be best performing model overall because of the high ROC. But if you need a model that predicts the positives better, you might want to consider MARS, given its high sensitivity.
-```
-
-
-We also need to consider that while the SVM model was the most accurate, there is a difference between the type of error that a model can make. In other words, predicting that one person will get the job when they ended up not getting the job is not as bad as predicting that a person won't get the job when they will end up getting the job.
-
-a) if the first case is seen as favourable, the SVM model is more appropriate because it has a higher overall accuracy as it cause one false positive and one false positive
-b) if the second is favourable, then the Random Forrest might be a better alternative. While it had a lower overall accuracy, it did not cause any X errors
 
 
 ## LDA2 vs Ranger
@@ -2427,10 +2479,18 @@ compare_models(model_lda2, model_ranger)
 We can see the actual predictions of each model below.
 
 
+**Key findings**:
+
+* whenever the LDA2 algorithm made a wrong prediction on someone who did not actually get a role, all others models made the same prediction. In simple terms, ALL algorithms said "these people should've received a role based on the data" but did not. This could be due to a multitude of factors that were not captured here
+* the most accurate model had one wrong prediction on a student who did get a role, which was predicted not to (we'd like to avoid this as possible in order to not discourage students from applying to a role they're likely to get)
+
+We should investigate to see what's special about these two groups of students.
+
+
 
 ```r
 test_data%>%
-  select(status, lda2, ranger, svm, glm, rf, knn, mars, rpart)%>% #ensure these are filled in
+  select(status, lda2, ranger, svm, glm, rf, knn, mars, rpart)%>%
   rename(Actual = status)%>%
   mutate(lda2 = ifelse(Actual == lda2, 
                       cell_spec(lda2, "html", color = "limegreen", bold = T), 
@@ -2444,9 +2504,6 @@ test_data%>%
          glm = ifelse(Actual == glm, 
                       cell_spec(glm, "html", color = "limegreen", bold = T), 
                       cell_spec(glm, "html", color = "red", bold = T)),
-         #xgb = ifelse(Actual == xgb, 
-         #             cell_spec(xgb, "html", color = "limegreen", bold = T), 
-         #             cell_spec(xgb, "html", color = "red", bold = T)),
          rf = ifelse(Actual == rf, 
                       cell_spec(rf, "html", color = "limegreen", bold = T), 
                       cell_spec(rf, "html", color = "red", bold = T)),
@@ -2456,9 +2513,6 @@ test_data%>%
          mars = ifelse(Actual == mars, 
                       cell_spec(mars, "html", color = "limegreen", bold = T), 
                       cell_spec(mars, "html", color = "red", bold = T)),
-         #xgbDART = ifelse(Actual == xgbDART, 
-         #             cell_spec(xgbDART, "html", color = "limegreen", bold = T), 
-        #              cell_spec(xgbDART, "html", color = "red", bold = T)), 
          rpart = ifelse(Actual == rpart, 
                       cell_spec(rpart, "html", color = "limegreen", bold = T), 
                       cell_spec(rpart, "html", color = "red", bold = T))) %>%
@@ -2952,19 +3006,6 @@ test_data%>%
 </table></div>
 
 
-Two interesting things stand out here:
-
-* whenever the LDA2 algorithm made a wrong prediction on someone who did not actually get a role, all others models made the same prediction. In simple terms, ALL algorithms said "these people should've received a role based on the data" but did not. This could be due to a multitude of factors that were not captured here
-* the most accurate model had one wrong prediction on a student who did get a role, which was predicted not to (we'd like to avoid this as possible in order to not discourage students from applying to a role they're likely to get)
-
-We should investigate to see what's special about these two groups of students.
-
-
-### Why do the models agree that 3 students should've gotten the role?
-
-
-Let's graph these students against the top 2-3 variables by importance and see if there are any trends
-
 
 ```r
 #Append the Y variable back on with original values
@@ -2973,22 +3014,438 @@ train_data$sl_no <- y_train
 
 #clear variables from memory
 rm(y_test, y_train)
+
+#backup test_data
+test_data2 <- test_data
+
+#bind the two newly formed data frames to the main test dataframe and rename the columns
+test_data2 <- cbind(test_data2, ranger_prob)%>%
+  rename("ranger_Not.Placed" = "Not.Placed",
+         "ranger_Placed" = "Placed")
+
+test_data2 <- cbind(test_data2, lda2_prob)%>%
+  rename("lda2_Not.Placed" = "Not.Placed",
+         "lda2_Placed" = "Placed")
+
+#remove old dataframes from both sets
+test_data2$ranger_prob <- NULL
+test_data2$lda2_prob <- NULL
+
+test_data <- test_data2
+
+rm(test_data2)
 ```
 
 
+### Why did the Random Forrest model wrongly predict that these people **will** get a placement? {.tabset .tabset-fade .tabset-pills -}
+
+
+**Key findings**:
+
+* the ranger alogorithm shown low (53%) to moderately high probabilities (84%) that these students will get a placement
+* none of them had work experience
+* we know that students that score somewhere in the middle in secondary and higher secondary have a high chance to be placed
+* it is also possible that these students looked right on paper, but had major flaws in their interviewing skills or other similar factors that were not captured in the data
+
+
+#### raw data {-}
 
 
 
-### Why do the most accurate models say that one person shouldn't have gotten the role?
+```r
+#get student's id
+filter_ids <- test_data%>%
+  filter(ranger!=status & status == "Not.Placed")%>%
+  select(sl_no)
+
+#get probabilities of errors
+probabilities <- test_data%>% 
+  filter(ranger!=status & status == "Not.Placed")%>%
+  select(sl_no, ranger_Placed, ranger_Not.Placed)
+
+#see original data
+raw_data %>%
+  select(-salary)%>%
+  mutate(prediction = "Placed")%>%
+  #get percentiles for each student
+  mutate(percentile_ssc = round(rank(ssc_p)/n()*100,2),
+         percentile_hsc = round(rank(hsc_p)/n()*100,2),
+         percentile_degree = round(rank(degree_p)/n()*100,2),
+         percentile_mba = round(rank(mba_p)/n()*100,2),
+         percentile_etest = round(rank(etest_p)/n()*100,2))%>%
+  filter(sl_no %in% c(filter_ids$sl_no))%>%
+  select(-ssc_p, -hsc_p, -degree_p, -mba_p, -etest_p)%>%
+  #format the cell based on the value
+  mutate(percentile_ssc = ifelse(percentile_ssc <= 33, 
+                      cell_spec(percentile_ssc, "html", color = "red", bold = T),
+                      ifelse(percentile_ssc <= 66,
+                      cell_spec(percentile_ssc, "html", color = "orange", bold = T),
+                      cell_spec(percentile_ssc, "html", color = "limegreen", bold = T))),
+         percentile_hsc = ifelse(percentile_hsc <= 33, 
+                      cell_spec(percentile_hsc, "html", color = "red", bold = T),
+                      ifelse(percentile_hsc <= 66,
+                      cell_spec(percentile_hsc, "html", color = "orange", bold = T),
+                      cell_spec(percentile_hsc, "html", color = "limegreen", bold = T))),
+         percentile_degree = ifelse(percentile_degree <= 33, 
+                      cell_spec(percentile_degree, "html", color = "red", bold = T),
+                      ifelse(percentile_degree <= 66,
+                      cell_spec(percentile_degree, "html", color = "orange", bold = T),
+                      cell_spec(percentile_degree, "html", color = "limegreen", bold = T))),
+         percentile_mba = ifelse(percentile_mba <= 33, 
+                      cell_spec(percentile_mba, "html", color = "red", bold = T),
+                      ifelse(percentile_mba <= 66,
+                      cell_spec(percentile_mba, "html", color = "orange", bold = T),
+                      cell_spec(percentile_mba, "html", color = "limegreen", bold = T))),
+         percentile_etest = ifelse(percentile_etest <= 33, 
+                      cell_spec(percentile_etest, "html", color = "red", bold = T),
+                      ifelse(percentile_etest <= 66,
+                      cell_spec(percentile_etest, "html", color = "orange", bold = T),
+                      cell_spec(percentile_etest, "html", color = "limegreen", bold = T))))%>%
+  #join probabilities
+  left_join(probabilities, by = "sl_no")%>%
+  
+  #build table
+  kbl(escape = FALSE,
+    caption = "")%>%
+  kable_paper(c("hover", "striped"), full_width = T)%>%
+  column_spec(2:10, bold = T, color = "black")%>%
+  scroll_box(width = "100%")
+```
+
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; "><table class=" lightable-paper lightable-striped lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; margin-left: auto; margin-right: auto;'>
+<caption></caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;"> sl_no </th>
+   <th style="text-align:left;"> gender </th>
+   <th style="text-align:left;"> ssc_b </th>
+   <th style="text-align:left;"> hsc_b </th>
+   <th style="text-align:left;"> hsc_s </th>
+   <th style="text-align:left;"> degree_t </th>
+   <th style="text-align:left;"> workex </th>
+   <th style="text-align:left;"> specialisation </th>
+   <th style="text-align:left;"> status </th>
+   <th style="text-align:left;"> prediction </th>
+   <th style="text-align:left;"> percentile_ssc </th>
+   <th style="text-align:left;"> percentile_hsc </th>
+   <th style="text-align:left;"> percentile_degree </th>
+   <th style="text-align:left;"> percentile_mba </th>
+   <th style="text-align:left;"> percentile_etest </th>
+   <th style="text-align:right;"> ranger_Placed </th>
+   <th style="text-align:right;"> ranger_Not.Placed </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 10 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> M </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Commerce </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.Fin </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">19.77</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">65.81</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">24.88</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">2.33</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">5.12</span> </td>
+   <td style="text-align:right;"> 53.2 </td>
+   <td style="text-align:right;"> 46.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 76 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> F </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Commerce </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.HR </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">21.86</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">32.33</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">91.86</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">79.07</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">57.21</span> </td>
+   <td style="text-align:right;"> 65.0 </td>
+   <td style="text-align:right;"> 35.0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 98 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> F </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Commerce </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.Fin </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">61.4</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">35.58</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">24.88</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">86.05</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">92.56</span> </td>
+   <td style="text-align:right;"> 74.2 </td>
+   <td style="text-align:right;"> 25.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 131 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> M </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Commerce </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.Fin </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">31.16</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">50.47</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">20.7</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">63.95</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">76.28</span> </td>
+   <td style="text-align:right;"> 71.2 </td>
+   <td style="text-align:right;"> 28.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 142 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> M </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Science </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.HR </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">46.05</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">45.35</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">20.7</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">49.77</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">24.42</span> </td>
+   <td style="text-align:right;"> 67.2 </td>
+   <td style="text-align:right;"> 32.8 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 159 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> M </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Science </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Sci.Tech </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.Fin </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">50.23</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">39.77</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">32.56</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">49.3</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">24.42</span> </td>
+   <td style="text-align:right;"> 83.8 </td>
+   <td style="text-align:right;"> 16.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:right;"> 166 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> F </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Central </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Commerce </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Comm.Mgmt </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.Fin </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">38.6</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">87.67</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">86.98</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">98.14</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">70</span> </td>
+   <td style="text-align:right;"> 66.8 </td>
+   <td style="text-align:right;"> 33.2 </td>
+  </tr>
+</tbody>
+</table></div>
+
+
+#### visualisation {-}
 
 
 
+```r
+  #graph it
+  raw_data %>% mutate(class = ifelse(sl_no %in% c(10, 76, 98, 131, 142, 159, 166), "Yes", "No"),
+                    size = as.numeric(ifelse(sl_no %in% c(10, 76, 98, 131, 142, 159, 166), 1, 0.5)))%>%
+  mutate(percentile_ssc = round(rank(ssc_p)/n()*100,2),
+         percentile_hsc = round(rank(hsc_p)/n()*100,2),
+         percentile_degree = round(rank(degree_p)/n()*100,2),
+         percentile_mba = round(rank(mba_p)/n()*100,2),
+         percentile_etest = round(rank(etest_p)/n()*100,2))%>%
+  
+  ggplot(aes(percentile_ssc, percentile_hsc, col = status, size = size))+
+  geom_point(show.legend = FALSE)+
+  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
+  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
+  geom_vline(xintercept =50, lty = 2)+
+  geom_hline(yintercept =50, lty = 2)+
+  theme_few()
+```
+
+<img src="figures/unnamed-chunk-55-1.png" width="100%" />
 
 
-It is possible that these people looked right on paper, but had major flaws in their interviewing skills or other similar factors that were not captured in the data. If that's the case, they should improve on those specific issues.
+### Why did the most accurate model predic that one person **shouldn't** have gotten the role? {.tabset .tabset-fade .tabset-pills -}
 
 
-What was the probability of each of these? Was it 1-99 or 45-55?
+**Key findings**:
+
+* the LDA2 algorithm was fairly confident that this student will not get the role (79% probability will not receive a placement)
+* it is likely because the student scored in the bottom 25% of the higher seocndary score and 10% of the employability test, which our model considered it was low enough not to award a placement
+* this student did not have work experience
+* however, this person scored very highly in their degree and MBA studies
+
+This more recent improvement in performance could mean that they improved in other aspects not captured in our dataset, and thus, received a placement.
+
+
+#### raw data {-}
+
+
+
+```r
+#get student's id
+filter_ids <- test_data%>%
+  filter(lda2!=status & status == "Placed")%>%
+  select(sl_no)
+
+#get probabilities of errors
+probabilities <- test_data%>% 
+  filter(lda2!=status & status == "Placed")%>%
+  select(sl_no, lda2_Not.Placed, lda2_Placed)
+
+#see original data
+raw_data %>%
+  select(-salary)%>%
+  mutate(prediction = "Not.Placed")%>%
+  #get percentiles for each student
+  mutate(percentile_ssc = round(rank(ssc_p)/n()*100,2),
+         percentile_hsc = round(rank(hsc_p)/n()*100,2),
+         percentile_degree = round(rank(degree_p)/n()*100,2),
+         percentile_mba = round(rank(mba_p)/n()*100,2),
+         percentile_etest = round(rank(etest_p)/n()*100,2))%>%
+  filter(sl_no %in% c(filter_ids$sl_no))%>%
+  select(-ssc_p, -hsc_p, -degree_p, -mba_p, -etest_p)%>%
+  #format the cell based on the value
+  mutate(percentile_ssc = ifelse(percentile_ssc <= 33, 
+                      cell_spec(percentile_ssc, "html", color = "red", bold = T),
+                      ifelse(percentile_ssc <= 66,
+                      cell_spec(percentile_ssc, "html", color = "orange", bold = T),
+                      cell_spec(percentile_ssc, "html", color = "limegreen", bold = T))),
+         percentile_hsc = ifelse(percentile_hsc <= 33, 
+                      cell_spec(percentile_hsc, "html", color = "red", bold = T),
+                      ifelse(percentile_hsc <= 66,
+                      cell_spec(percentile_hsc, "html", color = "orange", bold = T),
+                      cell_spec(percentile_hsc, "html", color = "limegreen", bold = T))),
+         percentile_degree = ifelse(percentile_degree <= 33, 
+                      cell_spec(percentile_degree, "html", color = "red", bold = T),
+                      ifelse(percentile_degree <= 66,
+                      cell_spec(percentile_degree, "html", color = "orange", bold = T),
+                      cell_spec(percentile_degree, "html", color = "limegreen", bold = T))),
+         percentile_mba = ifelse(percentile_mba <= 33, 
+                      cell_spec(percentile_mba, "html", color = "red", bold = T),
+                      ifelse(percentile_mba <= 66,
+                      cell_spec(percentile_mba, "html", color = "orange", bold = T),
+                      cell_spec(percentile_mba, "html", color = "limegreen", bold = T))),
+         percentile_etest = ifelse(percentile_etest <= 33, 
+                      cell_spec(percentile_etest, "html", color = "red", bold = T),
+                      ifelse(percentile_etest <= 66,
+                      cell_spec(percentile_etest, "html", color = "orange", bold = T),
+                      cell_spec(percentile_etest, "html", color = "limegreen", bold = T))))%>%
+  #join probabilities
+  left_join(probabilities, by = "sl_no")%>%
+  #build table
+  kbl(escape = FALSE,
+    caption = "")%>%
+  kable_paper(c("hover", "striped"), full_width = F)%>%
+  column_spec(2:10, bold = T, color = "black")%>%
+  scroll_box(width = "100%", height = "100%")
+```
+
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:100%; overflow-x: scroll; width:100%; "><table class=" lightable-paper lightable-striped lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
+<caption></caption>
+ <thead>
+  <tr>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> sl_no </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> gender </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> ssc_b </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> hsc_b </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> hsc_s </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> degree_t </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> workex </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> specialisation </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> status </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> prediction </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> percentile_ssc </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> percentile_hsc </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> percentile_degree </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> percentile_mba </th>
+   <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> percentile_etest </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> lda2_Not.Placed </th>
+   <th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;"> lda2_Placed </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:right;"> 23 </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> F </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Others </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Science </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Sci.Tech </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> No </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Mkt.HR </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: orange !important;">59.53</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">25.12</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">80.47</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">85.58</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">9.3</span> </td>
+   <td style="text-align:right;"> 70.32403 </td>
+   <td style="text-align:right;"> 29.67597 </td>
+  </tr>
+</tbody>
+</table></div>
+
+
+#### visualisation {-}
+
+
+
+```r
+#graph it
+raw_data %>% mutate(class = ifelse(sl_no == 23, "Yes", "No"),
+                    size = as.numeric(ifelse(sl_no == 23, 5, 4)))%>%
+  mutate(percentile_ssc = round(rank(ssc_p)/n()*100,2),
+         percentile_hsc = round(rank(hsc_p)/n()*100,2),
+         percentile_degree = round(rank(degree_p)/n()*100,2),
+         percentile_mba = round(rank(mba_p)/n()*100,2),
+         percentile_etest = round(rank(etest_p)/n()*100,2))%>%
+  
+  ggplot(aes(percentile_hsc, percentile_etest, size = size))+
+  geom_point(show.legend = FALSE, aes(col = status))+
+  scale_fill_manual(values = c("#DC3220", "#40B0A6"))+
+  scale_colour_manual(values = c("#DC3220", "#40B0A6"))+
+  geom_vline(xintercept =50, lty = 2)+
+  geom_hline(yintercept =50, lty = 2)+
+  theme_few()
+```
+
+<img src="figures/unnamed-chunk-57-1.png" width="100%" />
 
 
 ## How many predictors did the most optimal model have?
@@ -3000,13 +3457,20 @@ Picking the lowest number of predictors is not always the wisest: they might've 
 
 ```r
 plot(model_rf, 
-     main = "The most optimal model was that with 9 predictors")
+     main = "The most optimal model was that with 10 predictors")
 ```
 
 <img src="figures/predictors-1.png" width="100%" />
 
 
 ## What were the most important variables?
+
+
+**Key findings**:
+
+It is interesting to observe that the scores mattered in their cronological order with secondary first, followed by higher secondary, undergraduate and then masters. This could be due to 2 main factors:
+  * the students who perform better early on are more likely to be the type of an ambitious student with a passion for learning that makes for a better hire
+  * there is less of a chance to differentiate at the higher education level towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
 
 
 
@@ -3033,11 +3497,15 @@ plot(imp, main = "Top variables ranked by importance",
 * two algorithms seemed to outperform the others, depending on the purpose of the prediction
   * if we're trying to ensure the highest accuracy, the SVM model was the most accurate
   * if we're trying to minimise the false positive (ensure this is correct, to minimise the number of people that are predicted to NOT get the job when they would've otherwise got the job), the Random Forrest model was the best choice
+* it was interesting to observe that the scores mattered in their cronological order with secondary first, followed by higher secondary, undergraduate and then masters. This could be due to 2 main factors:
+  * the students who perform better early on are more likely to be the type of an ambitious student with a passion for learning that makes for a better hire
+  * there is less of a chance to differentiate at the higher education level towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
 
 
-# Next steps: 
+# Next steps/recommendations: 
 
 * predictive algorithm on salary and which factors contributed
+* putting this analysis and the two suggested algorithms into a dashboard where someone can input their scores and see whether the model would predict that they would get the role or not
 
 
 
@@ -3046,26 +3514,6 @@ plot(imp, main = "Top variables ranked by importance",
 
 
 
-1) cost vs profit matrix (put in a nice table) - page 260
-
-
-Observed
-Response     Non response
-TP             FP              26.4       2      Response
-FN             TN              28.4       -      Non-response
 
 
 
-2) describe the issue then of how this applies to the models that we have
-
-3) draw a ROC
-
-4) combine proportion of the model
-
-* read others' project and learn from them
-
-* what do the probability estimates for each class tell us about the model's confidence? (51% vs 99%) - equivocal areas
-
-* try and understand why it failed on those people that the model failed on
-
-- metric = "ROC"?
