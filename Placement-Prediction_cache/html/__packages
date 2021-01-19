@@ -25,6 +25,9 @@ doSNOW
 ggpubr
 rstatix
 ggthemes
+e1071
+pROC
+broom
 Formula
 plotrix
 TeachingDemos
