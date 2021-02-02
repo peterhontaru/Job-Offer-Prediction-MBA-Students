@@ -69,10 +69,9 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
          sl_no = as.factor(sl_no))
 ```
 
-
 <center>
 
-<img src="_support files/education.jpg" width="350" height="300">
+![Example of the bot chat pop-up window](_support files/education.jpg)
 
 </center>
 
