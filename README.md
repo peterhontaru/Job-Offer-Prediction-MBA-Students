@@ -2,11 +2,11 @@ Job Offer Prediction - MBA Students
 ================
 by Peter Hontaru
 
-<center>
+<div style="text-align:center">
 
 <img src="_support files/education.jpg" width="350" height="300">
 
-</center>
+</div>
 
 # Introduction
 

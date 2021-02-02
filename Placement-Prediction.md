@@ -70,6 +70,13 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
 ```
 
 
+<center>
+
+<img src="_support files/education.jpg" width="350" height="300">
+
+</center>
+
+
 # Introduction
 
 
