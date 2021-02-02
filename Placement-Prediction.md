@@ -20,7 +20,7 @@
         keep_md: true
         
     title: "Job Offer Prediction - MBA Students"
-    subtitle: "I'm... hired? Can we predict which student received a placement offer?"
+    subtitle: "Can we predict which student received a placement offer?"
     author: "by Peter Hontaru"
 ---
 
@@ -75,10 +75,11 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
 
 ## Problem Statement:
 
-Can we predict if a candiate was placed in a role after their MBA studies? If so, which factors helped the most (ie. work experience, degree, school results, gender, etc)?
+**Can we predict if a candiate was placed in a role after their MBA studies? If so, which factors helped the most (ie. work experience, degree, school results, gender, etc)?**
 
 
 ## Key takeaways
+
 
 #### Students {-}
 
@@ -95,7 +96,7 @@ The second model might be more suitable as it achieved a higher overall accuracy
 ## Dataset information:
 
 * contains 15 variables and a total of 215 observations
-* was made available by **Ben Roshan** and it is available to download from https://www.kaggle.com/benroshan/factors-affecting-campus-placement
+* made available by **Ben Roshan** and it is available to download from https://www.kaggle.com/benroshan/factors-affecting-campus-placement
 * raw data files are also available within the “raw data” folder of this repo
 
 
@@ -245,9 +246,9 @@ Check for *NULL*s:
 
 ```r
 #check for nulls
-raw_data %>% summarise_all(~ sum(is.null(.))) %>% sum() %>% 
+raw_data %>% summarise_all(~ sum(is.null(.))) %>% sum()%>% 
   kbl(col.names = "Number of NULLs",
-      align = c("c", "c")) %>%
+      align = c("c", "c"))%>%
   kable_paper("hover", full_width = F)%>%
   column_spec(1, color = "green", bold = TRUE)
 ```
@@ -272,9 +273,9 @@ Check for *NA*s:
 
 ```r
 #check NAs
-raw_data %>% summarise_all(~ sum(is.na(.))) %>% sum() %>%
+raw_data %>% summarise_all(~ sum(is.na(.))) %>% sum()%>%
     kbl(col.names = "Number of NAs",
-      align = c("c", "c")) %>%
+      align = c("c", "c"))%>%
   kable_paper("hover", full_width = F)%>%
   column_spec(1, color = "red", bold = TRUE)
 ```
@@ -299,7 +300,7 @@ Let's dig deeper and see why we have 67 NAs.
 
 ```r
 #we have 67 NAs - let's see which category has these values
-raw_data %>% summarise_all(~ sum(is.na(.))) %>%
+raw_data %>% summarise_all(~ sum(is.na(.)))%>%
     kbl()%>%
   kable_paper("hover", full_width = F)%>%
   column_spec(15, color = "red", bold = TRUE)%>%
@@ -354,7 +355,7 @@ Lastly, we need to check why we have these 67 NAs in the salary category. Is thi
 
 ```r
 #let's check that this is because some students did not get placed and thus, had no salary
-raw_data %>% group_by(status) %>% count() %>%     
+raw_data %>% group_by(status) %>% count()%>%     
   kbl(col.names = c("Status", "n"),
       align = c("c", "c")) %>%
   kable_paper("hover", full_width = F)%>%
@@ -402,13 +403,13 @@ It looks like we have 67 NAs in the salary column due to the fact that 67 studen
 raw_data_corr <- select_if(raw_data, is.numeric)%>%
   select(-salary)
 
-# Compute a correlation matrix
+#compute a correlation matrix
 corr <- round(cor(raw_data_corr),2)
 
-# Compute a matrix of correlation p-values
+#compute a matrix of correlation p-values
 p.mat <- cor_pmat(raw_data_corr)
 
-# Visualize the correlation matrix
+#visualize the correlation matrix
 ggcorrplot(corr, method = "square", 
            ggtheme = ggthemes::theme_few, 
            
@@ -456,12 +457,12 @@ raw_data %>%
 <img src="figures/unnamed-chunk-9-1.png" width="100%" />
 
 
-## What does the distribution of the scores look like for each level of study? {.tabset .tabset-fade .tabset-pills}
+## What does the distribution of the scores look like for each level of education? {.tabset .tabset-fade .tabset-pills}
 
 **Key findings**:
 
 * the distribution become more concentated around the median range(62-66) as the student progressed in their education, **from secondary** (wide distribution) **to MBA** (narrow distribution)
-* the **employability test** has a different trend, with a very wide and almost equal distribution of each level of study
+* the **employability test** has a different trend, with a very wide and almost equal distribution of each bucket
 
 
 
@@ -558,7 +559,8 @@ t_test_degree <- raw_data%>%
   t_test(degree_p ~ gender)%>%
   add_significance()
 
-raw_data %>% ggplot(aes(degree_p, fill = gender, col = gender))+
+raw_data %>% 
+  ggplot(aes(degree_p, fill = gender, col = gender))+
   geom_density(alpha = 0.3, lwd = 1, show.legend = FALSE)+
   geom_rug()+
   scale_fill_manual(values = c(col_1, col_2))+
@@ -575,7 +577,7 @@ raw_data %>% ggplot(aes(degree_p, fill = gender, col = gender))+
 
 ```r
 t_test_degree%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -618,7 +620,8 @@ t_test_mba <- raw_data%>%
   t_test(mba_p ~ gender)%>%
   add_significance()
 
-raw_data %>% ggplot(aes(mba_p, fill = gender, col = gender))+
+raw_data%>% 
+  ggplot(aes(mba_p, fill = gender, col = gender))+
   geom_density(alpha = 0.3, lwd = 1, show.legend = FALSE)+
   geom_rug()+
   scale_fill_manual(values = c(col_1, col_2))+
@@ -634,8 +637,8 @@ raw_data %>% ggplot(aes(mba_p, fill = gender, col = gender))+
 <img src="figures/unnamed-chunk-17-1.png" width="100%" />
 
 ```r
-t_test_mba %>%
-  kbl() %>%
+t_test_mba%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -682,7 +685,6 @@ Since we know that the scores became more concentrated around the median range(6
 
 Unfortunately, we only have data on the **employability score**.
 
-
 **Key findings**:
 
 The score differences between those who received an offer and those who did not:
@@ -691,10 +693,9 @@ The score differences between those who received an offer and those who did not:
 * significant at **employability test**
 * no significance at the **MBA** level
 
+When combining the stats as lower education (secondary and higher secondary) and higher education (university and MBA), it was interesting to see that:
 
-When combining the stats as lower education (secondary and higher secondary) and higher education (university and MBA), it was interesting to see that
-
-* **virtually everyone that ranked in the top 25th percentile in their lower education were placed regardless of their higher education performance**
+* **virtually everyone that ranked in the top 25th percentile in their lower education were placed, regardless of their higher education performance**
 * almost no one in the bottom 25th percentile across the lower education was placed, regardless of their higher education peformance
 
 
@@ -765,8 +766,8 @@ score_placement(test=raw_data$ssc_p)
 
 ```r
 #add t-test stats
-t_test %>%
-  kbl() %>%
+t_test%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -818,8 +819,8 @@ score_placement(test=raw_data$hsc_p)
 
 ```r
 #add t-test stats
-t_test %>%
-  kbl() %>%
+t_test%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -871,8 +872,8 @@ score_placement(test=raw_data$degree_p)
 
 ```r
 #add t-test stats
-t_test %>%
-  kbl() %>%
+t_test%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -924,8 +925,8 @@ score_placement(test=raw_data$mba_p)
 
 ```r
 #add t-test stats
-t_test %>%
-  kbl() %>%
+t_test%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -977,8 +978,8 @@ score_placement(test=raw_data$etest_p)
 
 ```r
 #add t-test stats
-t_test %>%
-  kbl() %>%
+t_test%>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1046,7 +1047,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(ssc_p ~ ssc_b)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1083,7 +1084,7 @@ t_test
 
 ```r
 #vs placement
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(ssc_b, fill = status))+
   geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c(col_red, col_green))+
@@ -1101,7 +1102,7 @@ raw_data %>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$ssc_b, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1131,7 +1132,7 @@ tidy(chisq.test(table(raw_data$ssc_b, raw_data$status)))%>%
 
 ```r
 #vs performance
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(hsc_p, fill=hsc_b, col = hsc_b))+
   geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
@@ -1151,7 +1152,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(hsc_p ~ hsc_b)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1188,7 +1189,7 @@ t_test
 
 ```r
 #vs placement
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(hsc_b, fill = status))+
   geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c(col_red, col_green))+
@@ -1206,7 +1207,7 @@ raw_data %>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$hsc_b, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1232,7 +1233,6 @@ tidy(chisq.test(table(raw_data$hsc_b, raw_data$status)))%>%
 
 ## Did the specialisation impact the chances of receiving a better score or place for an offer? {.tabset .tabset-fade .tabset-pills}
 
-
 **Key findings**:
 
 * **higher secondary**:
@@ -1244,7 +1244,7 @@ tidy(chisq.test(table(raw_data$hsc_b, raw_data$status)))%>%
 * **MBA**:
   * there were no significant differences in performance between the scores of the two groups
   * significantly more Marketing and Finance students received an offer when compared to those specialised in Marketing and HR
-  * the Marketing and Finance students scored significantly better on the employability test than Marketing and HR students
+  * the Marketing and Finance students scored significantly better on the **employability test** than Marketing and HR students
 
 
 ### higher secondary {-}
@@ -1253,7 +1253,7 @@ tidy(chisq.test(table(raw_data$hsc_b, raw_data$status)))%>%
 
 ```r
 #vs performance
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(hsc_p, fill=hsc_s, col = hsc_s))+
   geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
@@ -1273,7 +1273,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(hsc_p ~ hsc_s)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1336,7 +1336,7 @@ t_test
 
 ```r
 #vs placement
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(hsc_s, fill = status))+
   geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c(col_red, col_green))+
@@ -1354,7 +1354,7 @@ raw_data %>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$hsc_s, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1384,7 +1384,7 @@ tidy(chisq.test(table(raw_data$hsc_s, raw_data$status)))%>%
 
 ```r
 #vs performance
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(degree_p, fill=degree_t, col = degree_t))+
   geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
@@ -1404,7 +1404,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(degree_p ~ degree_t)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1467,7 +1467,7 @@ t_test
 
 ```r
 #vs placement
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(degree_t, fill = status))+
   geom_bar(position = "fill", col = "black")+
   scale_fill_manual(values = c(col_red, col_green))+
@@ -1485,7 +1485,7 @@ raw_data %>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$degree_t, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1515,7 +1515,7 @@ tidy(chisq.test(table(raw_data$degree_t, raw_data$status)))%>%
 
 ```r
 #vs performance
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(mba_p, fill=specialisation, col = specialisation))+
   geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
@@ -1535,7 +1535,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(mba_p ~ specialisation)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1590,7 +1590,7 @@ raw_data %>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$specialisation, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1620,7 +1620,7 @@ tidy(chisq.test(table(raw_data$specialisation, raw_data$status)))%>%
 
 ```r
 #vs performance (e-test)
-raw_data %>% 
+raw_data%>% 
   ggplot(aes(etest_p, fill=specialisation, col = specialisation))+
   geom_density(alpha = 0.3, show.legend = FALSE, lwd = 1)+
   geom_rug()+
@@ -1640,7 +1640,7 @@ raw_data %>%
 t_test <- raw_data%>%
   t_test(etest_p ~ specialisation)%>%
   add_significance()%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 
 t_test
@@ -1678,7 +1678,6 @@ t_test
 
 ## Did gender impact the chances of receving a placement offer?
 
-
 **Key findings**:
 
 * there were no significant differences in gender between the students that received a role and those that did not
@@ -1687,7 +1686,7 @@ t_test
 
 ```r
 #graph
-raw_data %>%
+raw_data%>%
   group_by(gender, status)%>%
   summarise(count = n()/100)%>%
   mutate(percentage = round(count/sum(count),2))%>%
@@ -1714,7 +1713,7 @@ ggplot(aes(gender, count, fill = status))+
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$gender, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1739,7 +1738,6 @@ tidy(chisq.test(table(raw_data$gender, raw_data$status)))%>%
 
 
 ## Did previous work experience matter?
-
 
 **Key findings**:
 
@@ -1778,7 +1776,7 @@ raw_data %>% group_by(workex, status)%>%
 ```r
 #categorical variables
 tidy(chisq.test(table(raw_data$workex, raw_data$status)))%>%
-  kbl() %>%
+  kbl()%>%
   kable_paper("hover", full_width = F)
 ```
 
@@ -1814,9 +1812,9 @@ Based on the previous Exploratory Data Analysis, we're comfortable to keep all t
 
 Let's split the dataset into the following:
 
-* a train dataset of 80% of the raw data to train our prediction model on (173 total students with a 69% placement rate)
+* a **train dataset** of 80% of the raw data to train our prediction model on (173 total students with a 69% placement rate)
   * 119 placed and 54 not placed
-* a test dataset of 20% of the raw data to then test the model on (42 total students with a 69% placement rate)
+* a **test dataset** of 20% of the raw data to then test the model on (42 total students with a 69% placement rate)
   * 29 placed and 13 not placed
 
 
@@ -2612,16 +2610,15 @@ summary(models_compare)
 
 **Key findings**:
 
-* it is important to define what "performance" means when it comes to selecting the best performing model, as one type of prediction error is costlier than the other
-* for example, incorrectly predicting that someone would be placed(false positive) is not as bad as incorrectly predicting that someone wouldn't be succesful (false negative). The cost of the former is the time spent interviewing, while the cost of the latter is losing out on a job that the student would've secured
-
-  * **scenario a)** if we're trying to maximise accuracy and optimise hiring costs, the LDA2 model is more appropriate as it only has 4 incorrect predictions (3 false positives and 1 false negative)
-  * **scenario b)** if we're trying to minimise costly errors (false negatives), then the Ranger model is more appropriate (7 false positives and 0 false negatives)
+* it is important to define what "performance" means when it comes to choosing a model (one type of prediction error is costlier than the other)
+* for example, incorrectly predicting that someone **would be** placed(false positive) is not as bad as incorrectly predicting that someone **would not be** placed(false negative). The cost of the former is the time spent interviewing, while the cost of the latter is losing out on a job that the student would've secured
+  * **scenario a) - preferable for hiring managers/recruiters -** if we're trying to maximise accuracy and optimise hiring costs, the LDA2 model (**91% accuracy**) is more appropriate as it only has 4 incorrect predictions (3 false positives and 1 false negative)
+  * **scenario b) - preferable for students -** if we're trying to minimise costly errors (false negatives), then the ranger model (83% accuracy) is more appropriate (7 false positives and **0 false negatives**)
 
 
 ### Quantitative assessment {-}
 
-The difference in accuracy between these two main models was of **-0.59%**, with the LDA2 model performing slightly better overall than the Ranger model.
+The difference in accuracy between these two main models was of **-0.59%**, with the LDA2 model performing slightly better overall than the ranger model.
 
 The p value was of **0.67** and the 95% confidence interval for this difference was **(-3.38%, 2.21%)**. This indicates that there is no evidence to support the idea that the accuracy for either model is significantly better.
 
@@ -2700,7 +2697,7 @@ plot.roc(test_data$status,
 
 #add legend
 legend("bottomright",
-       legend = c("Ranger", "LDA2"),
+       legend = c("ranger", "LDA2"),
        col=c("#00AFBB", "#E69F00"),
        lwd = 4)
 ```
@@ -2721,10 +2718,12 @@ We can see the actual predictions of each model below.
 
 **Key findings**:
 
-* whenever the LDA2 algorithm made a wrong prediction on someone who did not actually get a role, all others models made the same prediction. In simple terms, ALL algorithms said "these people should've received a role based on the data" but did not. This could be due to a multitude of factors that were not captured here
-* the most accurate model had one wrong prediction on a student who did get a role, which was predicted not to (we'd like to avoid this as possible in order to not discourage students from applying to a role they're likely to get)
+* whenever the LDA2 algorithm made a wrong prediction on someone who did not actually get a role, almost all others models made the same prediction (1 exception out of 24 predictions)
+  * in simple terms, the algorithms said "these people should've received a role based on the data" but did not
+* the LDA2 model had one wrong prediction on a student who did get a role when they were predicted not to
+  * we'd like to avoid this as possible in order to not discourage students from applying to a role they're likely to get
 
-We should investigate to see what's special about these two groups of students.
+We will investigate and visualise the data for the above two points shortly.
 
 
 
@@ -2754,18 +2753,18 @@ test_data%>%
                       cell_spec(knn, "html", color = "limegreen", bold = F), 
                       cell_spec(knn, "html", color = "red", bold = F)),
          nb = ifelse(Actual == nb, 
-                      cell_spec(nb, "html", color = "limegreen", bold = T), 
-                      cell_spec(nb, "html", color = "red", bold = T))) %>%
+                      cell_spec(nb, "html", color = "limegreen", bold = F), 
+                      cell_spec(nb, "html", color = "red", bold = F))) %>%
   
   kbl(escape = FALSE,
-    caption = "Actual performance vs prediction")%>%
+    caption = "Prediction table: Actual performance (first column) vs each model's prediction")%>%
   kable_paper(c("hover", "striped"), full_width = F)%>%
   column_spec(1, bold = T, color = "black")%>%
   scroll_box(height = "400px")
 ```
 
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; "><table class=" lightable-paper lightable-striped lightable-hover" style='font-family: "Arial Narrow", arial, helvetica, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;'>
-<caption>Actual performance vs prediction</caption>
+<caption>Prediction table: Actual performance (first column) vs each model's prediction</caption>
  <thead>
   <tr>
    <th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;"> Actual </th>
@@ -2784,7 +2783,7 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
@@ -2795,7 +2794,7 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -2806,282 +2805,18 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3092,73 +2827,29 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3169,29 +2860,18 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
   </tr>
   <tr>
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
-  </tr>
-  <tr>
-   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3202,7 +2882,7 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
@@ -3213,7 +2893,29 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3224,7 +2926,7 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3235,7 +2937,304 @@ test_data%>%
    <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
-   <td style="text-align:left;"> <span style=" font-weight: bold;    color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: red !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Not.Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Not.Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;font-weight: bold;color: black !important;"> Placed </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style=" font-weight: bold;   text-decoration: underline; color: limegreen !important;">Placed</span> </td>
+   <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
    <td style="text-align:left;"> <span style="     color: limegreen !important;">Placed</span> </td>
@@ -3379,11 +3378,11 @@ test_data %>%
 <img src="figures/unnamed-chunk-64-1.png" width="100%" />
 
 
-### Why did the Ranger model incorrectly predict that 7 students **will** get a placement? {.tabset .tabset-fade .tabset-pills -}
+### Why did the ranger model incorrectly predict that 7 students **will** get a placement? {.tabset .tabset-fade .tabset-pills -}
 
 **Key findings**:
 
-* the Ranger alogorithm shown low (57%) to moderately high (82%) probabilities that these students will get a placement
+* the ranger alogorithm shown low (57%) to moderately high (82%) probabilities that these students will get a placement
 * none of them had work experience
 * the students scored somewhere in the middle percentiles in their Secondary and Higher Secondary education which usually resulted in a high probability to be placed
 * it is also possible that these students looked right on paper, but had major flaws in their interviewing skills or other similar factors that were not captured in the data
@@ -3677,7 +3676,7 @@ raw_data %>%
 </table></div>
 
 
-### Why did the most accurate model predict that 1 student **shouldn't** will not get the role? {.tabset .tabset-fade .tabset-pills -}
+### Why did the LDA2 model incorrrectly predict that 1 student **will not** get a placement? {.tabset .tabset-fade .tabset-pills -}
 
 **Key findings**:
 
@@ -3853,7 +3852,7 @@ raw_data %>%
 
 ## How many predictors did the most optimal model have?
 
-Despite the result, selecting the lowest number of predictors is not always the wisest, as they might've not had the chance to show their worth (common with low sample sizes).
+Despite the result, selecting the lowest number of predictors is not always optimal, as they might've not had the chance to show their worth (common with low sample sizes).
 
 
 ```r
@@ -3868,50 +3867,47 @@ plot(model_rf,
 
 **Key findings**:
 
-It is interesting to observe that the scores mattered in their cronological order with secondary first, followed by higher secondary, undergraduate and then masters. This could be due to 2 main factors:
-
+* it is interesting to observe that the scores mattered in their cronological order with secondary first, followed by higher secondary, undergraduate and then masters. This could be due to 2 main factors:
   * the students who perform better early on are more likely to be the type of an ambitious student with a passion for learning that makes for a better hire
-  * there is less of a chance to differentiate at the higher education level towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
+  * there is less of a chance to differentiate based on performance scores alone towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
 
 
 
 ```r
 imp <- varImp(model_rf) #can also use glm here
 
-plot(imp, main = "Top variables ranked by importance",
-     sub = "As calculated by the Random Forrest (rf) model")
+plot(imp, main = "Top variables ranked by importance")
 ```
 
 <img src="figures/factors-1.png" width="100%" />
 
 
-# Summary EDA:
+# Summary:
 
-* grades became more concentrated around the median from secondary to MBA,likely because it is hard for students to differentiate on grades alone, and likely that they will focus on other achievements (work experience, voluntary roles)
-* females performed significantly better than males during university and mba
-* a higher proportion of males were placed in a role than females
-* the students who received a role performed significantly better during secondary, highschool and university, but not at the MBA level
 
-# Summary algorithm:
+### Exploratory Data Analysis {-}
 
-* it is important to define what "performance" means when it comes to selecting the best performing model, as one type of prediction error is costlier than the other
-* for example, incorrectly predicting that someone would be placed(false positive) is not as bad as incorrectly predicting that someone wouldn't be succesful (false negative). The cost of the former is the time spent interviewing, while the cost of the latter is losing out on a job that the student would've secured
-  * **scenario a)** if we're trying to maximise accuracy and optimise hiring costs, the LDA2 model is more appropriate as it only has 4 incorrect predictions (3 false positives and 1 false negative)
-  * **scenario b)** if we're trying to minimise costly errors (false negatives), then the Ranger model is more appropriate (7 false positives and 0 false negatives)
+* overall, the grades became more concentrated as the students progressed in their education; it could be that it is harder for students to differentiate on grades alone and that they will focus on other achievements (work experience, voluntary roles)
+* successfuly placed students performed significantly better than their counterparts during secondary, highschool and university, but not at the MBA level
+* females performed significantly better than males during university and mba studies but it did not lead to significant differences in placement rate
 
-It was interesting to observe that the lower levels of education impacted the likelyhood of a student to be placed more than the higher levels. The Secondary level was first, ollowed by higher secondary, undergraduate and then masters. This could be due to 2 main factors:
 
+### Classification Analysis {-}
+
+* it is important to define what "performance" means when it comes to choosing a model (one type of prediction error is costlier than the other)
+* for example, incorrectly predicting that someone **would be** placed(false positive) is not as bad as incorrectly predicting that someone **would not be** placed(false negative). The cost of the former is the time spent interviewing, while the cost of the latter is losing out on a job that the student would've secured
+  * **scenario a) - preferable for hiring managers/recruiters -** if we're trying to maximise accuracy and optimise hiring costs, the LDA2 model (**91% test accuracy**) is more appropriate as it only has 4 incorrect predictions (3 false positives and 1 false negative)
+  * **scenario b) - preferable for students -** if we're trying to minimise costly errors (false negatives), then the ranger model (83% test accuracy) is more appropriate (7 false positives and **0 false negatives**)
+* the scores mattered in their cronological order with secondary first, followed by higher secondary, undergraduate and then masters; this could be due to 2 main factors:
   * the students who perform better early on are more likely to be the type of an ambitious student with a passion for learning that makes for a better hire
-  * there is less of a chance to differentiate at the higher education level towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
+  * there is less of a chance to differentiate based on performance scores alone towards the end of the formal education since we've seen that most vary around the median (between 60% and 70%) instead of the much wider range early on
+  
 
 # Next steps/recommendations: 
 
 * predictive algorithm to see if we could anticipate placement salaries and understand which factors contributed the most
 * creating a dashboard where someone can input their scores and see whether the model would predict that they would get the role or not
 * it would be very useful to gather more data, especially that of other generations of graduates
-
-
-
 
 
 

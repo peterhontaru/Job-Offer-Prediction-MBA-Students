@@ -2,28 +2,35 @@ Job Offer Prediction - MBA Students
 ================
 by Peter Hontaru
 
+<center>
+
+<img src="_support files/education.jpg" width="350" height="300">
+
+</center>
+
 # Introduction
 
 ## Problem Statement:
 
-Can we predict which candiates was placed in a role? If so, which
-factors helped the most (ie. work experience, degree, school results,
-gender, etc)?
+**Can we predict if a candiate was placed in a role after their MBA
+studies? If so, which factors helped the most (ie. work experience,
+degree, school results, gender, etc)?**
 
 ## Who is this project intended for?
 
 -   **students** looking to assess whether they’re likely to receive a
     placement offer or not
--   **hiring managers/recruiters** trying to optimise their recruitment
+-   **hiring managers/recruiters** trying to optimise their process
 -   *those generally interested in what improves a candidate’s chance to
     receive a placement role at the MBA level*
 
 ## Why this dataset?
 
 As a school governor, I am very interested in the importance of
-education in receiving job offers as well as the current trends in the
-job market itself. This would also prove as an excellent way to further
-improve my data science skills.
+education in preparing a student for the job market as well as the
+current trends in the job market itself. This project would prove as an
+excellent way to further improve my data science skills while learning
+more about these topics.
 
 # Key insights
 
@@ -31,10 +38,9 @@ improve my data science skills.
 
 -   when combining the stats as lower education (secondary and higher
     secondary) and higher education (university and MBA), it was
-    interesting to see that
-
+    interesting to see that:
     -   **virtually everyone that ranked in the top 25th percentile in
-        their lower education were placed regardless of their higher
+        their lower education were placed, regardless of their higher
         education performance**
     -   almost no one in the bottom 25th percentile across the lower
         education was placed, regardless of their higher education
@@ -43,36 +49,34 @@ improve my data science skills.
 ![education](figures/education-1.png)
 
 -   it is important to define what “performance” means when it comes to
-    selecting the best performing model, as one type of prediction error
-    is costlier than the other
-
-    -   for example, incorrectly predicting that someone would be
-        placed(false positive) is not as bad as incorrectly predicting
-        that someone wouldn’t be succesful (false negative). The cost of
-        the former is the time spent interviewing, while the cost of the
-        latter is losing out on a job that the student would’ve secured
-    -   **scenario a)** if we’re trying to maximise accuracy and
-        optimise hiring costs, the LDA2 model is more appropriate as it
+    choosing a model (one type of prediction error is costlier than the
+    other). For example, incorrectly predicting that someone **would
+    be** placed(false positive) is not as bad as incorrectly predicting
+    that someone **would not be** placed(false negative). The cost of
+    the former is the time spent interviewing, while the cost of the
+    latter is losing out on a job that the student would’ve secured
+    -   **scenario a) - preferable for hiring managers/recruiters -** if
+        we’re trying to maximise accuracy and optimise hiring costs, the
+        LDA2 model (**91% test accuracy**) is more appropriate as it
         only has 4 incorrect predictions (3 false positives and 1 false
         negative)
-    -   **scenario b)** if we’re trying to minimise costly errors (false
-        negatives), then the Ranger model is more appropriate (7 false
-        positives and 0 false negatives)
+    -   **scenario b) - preferable for students -** if we’re trying to
+        minimise costly errors (false negatives), then the ranger model
+        (83% test accuracy) is more appropriate (7 false positives and
+        **0 false negatives**)
 
 ![accuracy](figures/accuracy-1.png)
 
--   it is interesting to observe that the scores mattered in their
-    cronological order with secondary first, followed by higher
-    secondary, undergraduate and then masters. This could be due to 2
-    main factors:
-
+-   the scores mattered in their cronological order with secondary
+    first, followed by higher secondary, undergraduate and then masters;
+    this could be due to 2 main factors:
     -   the students who perform better early on are more likely to be
         the type of an ambitious student with a passion for learning
         that makes for a better hire
-    -   there is less of a chance to differentiate at the higher
-        education level towards the end of the formal education since
-        we’ve seen that most vary around the median (between 60% and
-        70%) instead of the much wider range early on
+    -   there is less of a chance to differentiate based on performance
+        scores alone towards the end of the formal education since we’ve
+        seen that most vary around the median (between 60% and 70%)
+        instead of the much wider range early on
 
 ![factors](figures/factors-1.png)
 
