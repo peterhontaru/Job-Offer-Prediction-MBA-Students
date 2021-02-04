@@ -69,9 +69,10 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
          sl_no = as.factor(sl_no))
 ```
 
+
 <center>
 
-![Example of the bot chat pop-up window](_support files/education.jpg)
+![](_support files/education.jpg){height=400px}
 
 </center>
 
@@ -86,17 +87,19 @@ raw_data <- read_csv("~/DS/Job-Offer-Prediction-MBA-Students/raw data/Placement_
 
 ## Key takeaways
 
+* overall, the grades became more concentrated as the students progressed in their education; it could be that it is harder for students to differentiate on grades alone and that they will focus on other achievements (work experience, voluntary roles)
+* successfuly placed students performed significantly better than their counterparts during secondary, highschool and university, but not at the MBA level
+* it is important to define what "performance" means when it comes to choosing a model (one type of prediction error is costlier than the other). For example, incorrectly predicting that someone **would be** placed(false positive) is not as bad as incorrectly predicting that someone **would not be** placed(false negative). The cost of the former is the time spent interviewing, while the cost of the latter is losing out on a job that the student would've secured
+
 
 #### Students {-}
 
-The LDA2 model might be more suitable as it did not have any false positives. This means that it correctly predicted if a student shouldn't apply for a role. 
-
-The most important factors, as shown by the Random Forrest model were secondary scores, higher secondary schores and work experience.
+* if we're trying to minimise costly errors (false negatives), then the ranger model (83% test accuracy) is more appropriate (7 false positives and **0 false negatives**)
 
 
 #### Hiring Managers {-}
 
-The second model might be more suitable as it achieved a higher overall accuracy and more student were predicted correctly.
+* if we're trying to maximise accuracy and optimise hiring costs, the LDA2 model (**91% test accuracy**) is more appropriate as it only has 4 incorrect predictions (3 false positives and 1 false negative)
 
 
 ## Dataset information:
